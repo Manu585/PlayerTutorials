@@ -1,0 +1,11 @@
+<?xlm version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project>
+<project name="PlayerTutorials-0.0.1" default="Build">
+    <xmlproperty file="pom.xml" prefix="pom" keeproot="false" />
+    <target name="Build">
+        <jar jarfile="S:/Unternehmungen/Minecraft Plugins/Servers/Localhost_1.20/plugins/${ant.project.name}.jar"
+             basedir="./target/classes/"
+             includes="**/*"
+        />
+    </target>
+</project>
