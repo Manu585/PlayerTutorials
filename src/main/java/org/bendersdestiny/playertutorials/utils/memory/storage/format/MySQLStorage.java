@@ -11,14 +11,23 @@ import java.util.logging.Level;
 @Getter
 public class MySQLStorage {
 	private static MySQLStorage instance;
-	private final String username;
-	private final String password;
-	private final String port;
-	private final String host;
-	private final String database;
+	protected final String username;
+	protected final String password;
+	protected final String port;
+	protected final String host;
+	protected final String database;
 
 	private Connection connection;
 
+	/**
+	 * The MySQL Storage type object
+	 *
+	 * @param username Database Username
+	 * @param password Database Password
+	 * @param port Database Port
+	 * @param host Database Host
+	 * @param database Database Name
+	 */
 	private MySQLStorage(String username, String password, String port, String host, String database) {
 		this.username = username;
 		this.password = password;

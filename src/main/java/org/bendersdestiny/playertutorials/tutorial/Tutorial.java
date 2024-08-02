@@ -21,8 +21,8 @@ public class Tutorial {
 	private Map<Integer, Area> areas;
 
 	public Tutorial(int id, String name) {
-		this.name = name;
 		this.id = id;
+		this.name = name;
 		areas = new ConcurrentHashMap<>();
 	}
 

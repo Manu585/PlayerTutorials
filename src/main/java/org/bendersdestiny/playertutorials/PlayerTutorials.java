@@ -18,9 +18,10 @@ public final class PlayerTutorials extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		chatUtil = new ChatUtil(this);
-		chatUtil.sendServerStartupMessage();
 		new ConfigManager(this);
-		storage = new Storage();
+		storage = new Storage(); // ConfigManager has to be initialized first
+
+		chatUtil.sendServerStartupMessage();
 
 		getServer().getPluginManager().registerEvents(new AreaListener(), this);
 	}
@@ -29,6 +30,9 @@ public final class PlayerTutorials extends JavaPlugin {
 	public void onDisable() {
 		if (storage != null) {
 			storage.disconnect();
+		}
+		if (chatUtil != null) {
+			chatUtil.sendServerStopMessage();
 		}
 	}
 }

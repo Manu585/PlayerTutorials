@@ -5,21 +5,20 @@ import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TutorialManager {
 	@Getter
-	private Tutorial tutorial;
+	private final Tutorial tutorial;
 	@Getter
-	private BukkitRunnable task;
+	private final BukkitRunnable task;
 
 	private final PlayerTutorials plugin;
 
 	@Getter
 	public static final Map<Integer, BukkitRunnable> activeTasks = new ConcurrentHashMap<>();
 
-	public TutorialManager(Tutorial tutorial, BukkitRunnable task, PlayerTutorials plugin) {
+	public TutorialManager(Tutorial tutorial, BukkitRunnable task, final PlayerTutorials plugin) {
 		this.tutorial = tutorial;
 		this.task = task;
 		this.plugin = plugin;

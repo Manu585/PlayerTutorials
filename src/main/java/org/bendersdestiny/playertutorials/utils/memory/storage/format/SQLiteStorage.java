@@ -15,6 +15,11 @@ public class SQLiteStorage {
 	private final File file;
 	private Connection connection;
 
+	/**
+	 * The SQLite Storage type
+	 *
+	 * @param file .db file
+	 */
 	private SQLiteStorage(File file) {
 		this.file = file;
 	}
