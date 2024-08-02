@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -56,13 +55,20 @@ public class GeneralMethods {
 		return new Location(w, x, y, z);
 	}
 
-
-	public static Set<Block> blocksInArea(Location PointA, Location PointB, Player player) {
+	/**
+	 * Get all {@link Block} in an area of two {@link Location}.
+	 *
+	 * @param PointA First point
+	 * @param PointB Second point
+	 * @param world world from the blocks
+	 * @return all blocks in the area
+	 */
+	public static Set<Block> blocksInArea(Location PointA, Location PointB, World world) {
 		Set<Block> blocks = new HashSet<>();
 		for (int x = PointA.getBlockX(); x <= PointB.getBlockX(); x++) {
 			for (int y = PointA.getBlockY(); y <= PointB.getBlockY(); y++) {
 				for (int z = PointA.getBlockZ(); z <= PointB.getBlockZ(); z++) {
-					blocks.add(player.getWorld().getBlockAt(new Location(player.getWorld(), x, y, z)));
+					blocks.add(world.getBlockAt(new Location(world, x, y, z)));
 				}
 			}
 		}

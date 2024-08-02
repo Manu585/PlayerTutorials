@@ -15,6 +15,13 @@ public class ChatUtil {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * Format a {@link String} to be able to use
+	 * HEX colors and normal Minecraft {@link ChatColor}
+	 *
+	 * @param msg MSG to format
+	 * @return formatted message
+	 */
 	public static String format(String msg) {
 		Matcher hexMatcher = hexPattern.matcher(msg);
 		while (hexMatcher.find()) {
@@ -26,6 +33,9 @@ public class ChatUtil {
 		return msg;
 	}
 
+	/**
+	 * Message for the server start
+	 */
 	public void sendServerStartupMessage() {
 		String startupMessage = """
 		\n
@@ -41,6 +51,9 @@ public class ChatUtil {
 		this.plugin.getServer().getConsoleSender().sendMessage(formattedMessage);
 	}
 
+	/**
+	 * Message for the server stop
+	 */
 	public void sendServerStopMessage() {
 		String startupMessage = """
 		\n

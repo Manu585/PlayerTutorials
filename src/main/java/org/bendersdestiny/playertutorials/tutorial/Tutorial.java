@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.tutorial.area.Area;
-import org.bukkit.Location;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,34 +15,54 @@ public class Tutorial {
 	@Setter
 	private String name;
 	@Setter
-	private Location spawnPoint;
-	@Setter
 	private Map<Integer, Area> areas;
 
+	/**
+	 * Freshly created {@link Tutorial} constructor
+	 *
+	 * @param id Id of the tutorial
+	 * @param name Name of the tutorial
+	 */
 	public Tutorial(int id, String name) {
 		this.id = id;
 		this.name = name;
-		areas = new ConcurrentHashMap<>();
+		this.areas = new ConcurrentHashMap<>();
 	}
 
-	public Tutorial(int id, String name, Location spawnPoint, Map<Integer, Area> areas) {
+	/**
+	 * Existing {@link Tutorial} coming from the database constructor
+	 *
+	 * @param id Id of the tutorial
+	 * @param name Name of the tutorial
+	 * @param areas Areas of the tutorial
+	 */
+	public Tutorial(int id, String name, Map<Integer, Area> areas) {
 		this.id = id;
 		this.name = name;
-		this.spawnPoint = spawnPoint;
 		this.areas = areas;
 	}
 
+	/**
+	 * Add an {@link Area} to a {@link Tutorial}
+	 *
+	 * @param area Area to add
+	 */
 	public void addArea(Area area) {
-		if (areas != null) {
-			areas.put(area.getId(), area);
+		if (this.areas != null && area != null) {
+			this.areas.put(area.getId(), area);
 		} else {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while adding a new area!");
 		}
 	}
 
+	/**
+	 * Remove an {@link Area} from a {@link Tutorial}
+	 *
+	 * @param area Area to remove
+	 */
 	public void removeArea(Area area) {
-		if (areas != null) {
-			areas.remove(area.getId());
+		if (this.areas != null && area != null) {
+			this.areas.remove(area.getId());
 		} else {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while removing a area!");
 		}

@@ -183,19 +183,15 @@ public class Storage {
 	 */
 	public void registerTutorial(Tutorial tutorial) {
 		this.connect();
-		String query = "INSERT INTO tutorials (id, name, spawnpoint, areas) VALUES (?, ?, ?, ?)";
+		String query = "INSERT INTO tutorials (id, name, areas) VALUES (?, ?, ?)";
 		try (Connection connection = this.getConnection();
 			 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 			preparedStatement.setInt(1, tutorial.getId());
 			preparedStatement.setString(2, tutorial.getName());
 
-			if (tutorial.getSpawnPoint() != null) {
-				preparedStatement.setString(3, GeneralMethods.locationToString(tutorial.getSpawnPoint()));
-			}
-
 			if (tutorial.getAreas() != null) {
 				for (int id : tutorial.getAreas().keySet()) {
-					preparedStatement.setInt(4, tutorial.getAreas().get(id).getId()); //TODO: Create area data to minimize performance usage
+					preparedStatement.setInt(3, tutorial.getAreas().get(id).getId()); //TODO: Create area data to minimize performance usage
 				}
 			}
 			preparedStatement.executeUpdate();
