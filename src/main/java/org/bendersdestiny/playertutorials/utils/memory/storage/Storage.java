@@ -56,8 +56,9 @@ public class Storage {
 			if (sqliteFile.createNewFile()) {
 				PlayerTutorials.getInstance().getLogger().log(Level.INFO, "SQLITE DB file successfully created!");
 			}
-		} catch (IOException ignored) {}
-
+		} catch (IOException ex) {
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Error while creating the .db file!" + ex);
+		}
 		sqliteStorage = SQLiteStorage.getInstance(sqliteFile);
 	}
 

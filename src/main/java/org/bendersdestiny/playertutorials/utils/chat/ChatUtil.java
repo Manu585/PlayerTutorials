@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 public class ChatUtil {
 	private final PlayerTutorials plugin;
-
 	private static final Pattern hexPattern = Pattern.compile("(&#)([a-fA-F0-9]{6})");
 
 	public ChatUtil(PlayerTutorials plugin) {
