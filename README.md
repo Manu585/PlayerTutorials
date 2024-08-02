@@ -1,4 +1,4 @@
-# Player Tutorials [Minecraft Plugin]
+# Player Tutorials
 
 ## Introdcution
 Player Tutorials is a Minecraft Plugin which helps people create advanced, lag free tutorials for their server.
