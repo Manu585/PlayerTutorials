@@ -8,7 +8,6 @@ import org.bendersdestiny.playertutorials.configuration.ConfigManager;
 import org.bendersdestiny.playertutorials.methods.GeneralMethods;
 import org.bendersdestiny.playertutorials.utils.memory.storage.format.MySQLStorage;
 import org.bendersdestiny.playertutorials.utils.memory.storage.format.SQLiteStorage;
-import org.checkerframework.common.returnsreceiver.qual.This;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,8 +50,7 @@ public class Storage {
 	 * Sets up the SQLite Storage functionality
 	 */
 	private void setupSQLiteStorage() {
-		File dataFolder = PlayerTutorials.getInstance().getDataFolder();
-		File sqliteFile = new File(dataFolder, "storage.db");
+		File sqliteFile = new File(PlayerTutorials.getInstance().getDataFolder(), "storage.db");
 
 		try {
 			if (sqliteFile.createNewFile()) {
@@ -165,7 +163,7 @@ public class Storage {
 	 */
 	public void registerArea(Area area) {
 		this.connect();
-		String query = "INSERT INTO areas (id, tutorial_id, name, pointOne, pointTwo, spawnpoint, tasks) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		String query = "INSERT INTO areas (id, tutorial_id, name, schematic, spawnpoint, tasks) VALUES (?, ?, ?, ?, ?, ?)";
 		try (Connection connection = this.getConnection();
 			 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 			preparedStatement.setInt(1, area.getId());
