@@ -18,7 +18,7 @@ public class GeneralMethods {
 	 * @return Location as String
 	 */
 	public static String locationToString(Location locationToTransform) {
-		if (locationToTransform != null) {
+		if (locationToTransform != null && locationToTransform.getWorld() != null) {
 			String world = locationToTransform.getWorld().getName();
 			double x = locationToTransform.getX();
 			double y = locationToTransform.getY();

@@ -8,6 +8,7 @@ import org.bendersdestiny.playertutorials.configuration.ConfigManager;
 import org.bendersdestiny.playertutorials.methods.GeneralMethods;
 import org.bendersdestiny.playertutorials.utils.memory.storage.format.MySQLStorage;
 import org.bendersdestiny.playertutorials.utils.memory.storage.format.SQLiteStorage;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 @Getter
+@SuppressWarnings("all")
 public class Storage {
 	private final String storageType;
 	private SQLiteStorage sqliteStorage;
@@ -69,8 +71,9 @@ public class Storage {
 		String username = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.username");
 		String password = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.password");
 		String database = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.database");
-		String host = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.host");
-		String port = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.port");
+		String host 	= ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.host");
+		String port 	= ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.port");
+
 		mySQLStorage = MySQLStorage.getInstance(username, password, port, host, database);
 	}
 
@@ -120,8 +123,7 @@ public class Storage {
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "tutorial_id INTEGER," +
                 "name TEXT NOT NULL," +
-                "pointOne TEXT NOT NULL," +
-                "pointTwo TEXT NOT NULL," +
+                "schematic TEXT NOT NULL," +
                 "spawnpoint TEXT NOT NULL," +
                 "tasks TEXT NOT NULL," +
                 "FOREIGN KEY(tutorial_id) REFERENCES tutorials(id))";
@@ -130,7 +132,9 @@ public class Storage {
             statement.execute(query);
         } catch (SQLException e) {
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create areas table!", e);
-        }
+        } finally {
+			this.disconnect();
+		}
     }
 
 	/**
@@ -149,6 +153,8 @@ public class Storage {
 			statement.execute(query);
 		} catch (SQLException e) {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create tutorials table!", e);
+		} finally {
+			this.disconnect();
 		}
 	}
 
