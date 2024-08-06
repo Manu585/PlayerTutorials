@@ -1,5 +1,9 @@
 package org.bendersdestiny.playertutorials.utils.memory;
 
-public class MemoryUtil {
+import org.bendersdestiny.playertutorials.tutorial.structure.Structure;
 
+import java.util.HashMap;
+
+public class MemoryUtil {
+    public static HashMap<Integer, Structure> activeStructures = new HashMap<>();
 }
