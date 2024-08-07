@@ -15,23 +15,23 @@ public class TeleportTask extends Task {
 	private Location from;
 	private Location to;
 
-	public TeleportTask(int id, int priority, Player player, Location from, Location to) {
-		super(id, player, priority);
+	public TeleportTask(int priority, Location from, Location to) {
+		super("TeleportTask", priority);
 		this.from = from;
 		this.to = to;
 	}
 
-	public void teleportPlayerToNewLocation() {
-		if (getPlayer() != null) {
-			getPlayer().teleport(to);
+	public void teleportPlayerToNewLocation(Player player) {
+		if (player != null) {
+			player.teleport(to);
 		} else {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while trying to teleport player to new location!\nLocation: " + GeneralMethods.locationToString(to));
 		}
 	}
 
-	public void resetPlayerToOldLocation(){
-		if (getPlayer() != null) {
-			getPlayer().teleport(from);
+	public void resetPlayerToOldLocation(Player player){
+		if (player != null) {
+			player.teleport(from);
 		} else {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Error while trying to teleport player back to old location!");
 		}

@@ -2,7 +2,6 @@ package org.bendersdestiny.playertutorials.utils.memory.storage;
 
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
-import org.bendersdestiny.playertutorials.tutorial.Tutorial;
 import org.bendersdestiny.playertutorials.tutorial.area.Area;
 import org.bendersdestiny.playertutorials.configuration.ConfigManager;
 import org.bendersdestiny.playertutorials.methods.GeneralMethods;
@@ -16,9 +15,8 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 @Getter
-@SuppressWarnings("all")
 public class Storage {
-	private final String storageType;
+	private String storageType;
 	private SQLiteStorage sqliteStorage;
 	private MySQLStorage mySQLStorage;
 
@@ -26,6 +24,7 @@ public class Storage {
 	 * The {@link Storage} object represents the storage in the PlayerTutorials plugin.
 	 * It manages the Storage type, tables and connections.
 	 */
+	@SuppressWarnings("all") // For the 'else if' part.
 	public Storage() {
 		this.storageType = Objects.requireNonNull(ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.type")).equalsIgnoreCase("mysql")
 				? "mysql"
@@ -40,6 +39,7 @@ public class Storage {
 					Level.WARNING,
 					"Wrong option in config.yml 'playertutorials.storage.type'." +
 					"Viable options: 'mysql' or 'sqlite'! Defaulting to 'sqlite'.");
+			this.storageType = "sqlite";
 			this.setupSQLiteStorage();
 		}
 		this.createTutorialTable();
@@ -51,7 +51,6 @@ public class Storage {
 	 */
 	private void setupSQLiteStorage() {
 		File sqliteFile = new File(PlayerTutorials.getInstance().getDataFolder(), "storage.db");
-
 		try {
 			if (sqliteFile.createNewFile()) {
 				PlayerTutorials.getInstance().getLogger().log(Level.INFO, "SQLITE DB file successfully created!");
@@ -101,39 +100,17 @@ public class Storage {
 	 * Gets the {@link Connection} object depending on the storage type
 	 *
 	 * @return the {@link Connection} object depending on storage type
-	 * @throws {@link SQLException}
+	 * @throws SQLException if there is any kind of error
 	 */
 	private Connection getConnection() throws SQLException {
 		if (storageType.equalsIgnoreCase("sqlite")) {
 			return sqliteStorage.getConnection();
-		} else {
+		} else if (storageType.equalsIgnoreCase("mysql")) {
 			return mySQLStorage.getConnection();
+		} else {
+			throw new NullPointerException("Error while receiving the connection from the database!");
 		}
 	}
-
-	/**
-	 * Creates the area table for all created tutorial areas
-	 */
-	public void createAreaTable() {
-        this.connect();
-        String query =
-				"CREATE TABLE IF NOT EXISTS areas (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "tutorial_id INTEGER," +
-                "name TEXT NOT NULL," +
-                "schematic TEXT NOT NULL," +
-                "spawnpoint TEXT NOT NULL," +
-                "tasks TEXT NOT NULL," +
-                "FOREIGN KEY(tutorial_id) REFERENCES tutorials(id))";
-        try (Connection connection = this.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.execute(query);
-        } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create areas table!", e);
-        } finally {
-			this.disconnect();
-		}
-    }
 
 	/**
 	 * Creates the tutorial table for all created tutorials
@@ -142,10 +119,11 @@ public class Storage {
 		this.connect();
 		String query =
 				"CREATE TABLE IF NOT EXISTS tutorials (" +
-				"id INTEGER PRIMARY KEY AUTOINCREMENT," +
-				"name TEXT NOT NULL," +
-				"spawnpoint TEXT," +
-				"areas TEXT)";
+						"id INTEGER PRIMARY KEY AUTOINCREMENT," +
+						"areaid INTEGER," +
+						"name TEXT NOT NULL," +
+						"icon VARCHAR(41)," +
+						"FOREIGN KEY(areaid) REFERENCES areas(id))";
 		try (Connection connection = this.getConnection();
 			 Statement statement = connection.createStatement()) {
 			statement.execute(query);
@@ -157,53 +135,89 @@ public class Storage {
 	}
 
 	/**
-	 * Register new area in the database
-	 *
-	 * @param area Area to register
+	 * Creates the area table for all created tutorial areas
 	 */
-	public void registerArea(Area area) {
+	public void createAreaTable() {
+        this.connect();
+        String query =
+				"CREATE TABLE IF NOT EXISTS areas (" +
+						"areaid INTEGER PRIMARY KEY," +
+						"tutorial_id INTEGER," +
+						"task_id INTEGER," +
+						"schematic VARCHAR," +
+						"areaname TEXT NOT NULL," +
+						"spawnpoint TEXT NOT NULL," +
+						"tasks TEXT NOT NULL," +
+						"FOREIGN KEY(tutorial_id) REFERENCES tutorials(id)" +
+						"FOREIGN KEY(task_id) REFERENCES tasks(id))";
+        try (Connection connection = this.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.execute(query);
+        } catch (SQLException e) {
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create areas table!", e);
+        } finally {
+			this.disconnect();
+		}
+    }
+
+	/**
+	 * Creates the tasks table
+	 */
+	public void createTasksTable() {
 		this.connect();
-		String query = "INSERT INTO areas (id, tutorial_id, name, schematic, spawnpoint, tasks) VALUES (?, ?, ?, ?, ?, ?)";
+		String query =
+				"CREATE TABLE IF NOT EXISTS tasks (" +
+						"tasktype VARCHAR," +
+						"taskpriority INTEGER)";
 		try (Connection connection = this.getConnection();
-			 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-			preparedStatement.setInt(1, area.getId());
-			// preparedStatement.setInt(2, area.getTutorial().getId());
-			preparedStatement.setString(3, area.getName());
-			preparedStatement.setString(4, GeneralMethods.locationToString(area.getPointOne()));
-			preparedStatement.setString(5, GeneralMethods.locationToString(area.getPointTwo()));
-			preparedStatement.setString(6, GeneralMethods.locationToString(area.getSpawnPoint()));
-			preparedStatement.setString(7, area.getTasks().toString()); //TODO: Find way to optimize storing data
-			preparedStatement.executeUpdate();
+			 Statement statement = connection.createStatement()) {
+			statement.execute(query);
 		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to add area to storage!", e);
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create tasks table!", e);
 		} finally {
 			this.disconnect();
 		}
 	}
 
 	/**
-	 * Register a new {@link Tutorial} in the database
-	 *
-	 * @param tutorial Tutorial to register
+	 * Create the teleport tasks table
 	 */
-	public void registerTutorial(Tutorial tutorial) {
+	public void createTeleportTaskTable() {
 		this.connect();
-		String query = "INSERT INTO tutorials (id, name, areas) VALUES (?, ?, ?)";
+		String query =
+				"CREATE TABLE IF NOT EXISTS teleporttasks (" +
+						"id INTEGER PRIMARY KEY AUTOINCREMENT" +
+						"areaid INTEGER," +
+						"from DOUBLE," +
+						"to DOUBLE" +
+						"FOREIGN KEY(areaid) REFERENCES areas(id)";
 		try (Connection connection = this.getConnection();
-			 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-			preparedStatement.setInt(1, tutorial.getId());
-			preparedStatement.setString(2, tutorial.getName());
-
-			if (tutorial.getAreas() != null) {
-				for (int id : tutorial.getAreas().keySet()) {
-					preparedStatement.setInt(3, tutorial.getAreas().get(id).getId()); //TODO: Create area data to minimize performance usage
-				}
-			}
-			preparedStatement.executeUpdate();
+			Statement statement = connection.createStatement()) {
+			statement.execute(query);
 		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to add tutorial to storage!", e);
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create teleporttask table!", e);
 		} finally {
 			this.disconnect();
+		}
+	}
+
+	/**
+	 * Save an area to the DB
+	 *
+	 * @param area Area to save
+	 */
+	public void saveArea(Area area) {
+		this.connect();
+		String query = "INSERT INTO areas (areaid, schematicfile, name, spawnpoint, tasks, priority) VALUES (?, ?, ?, ?, ?, ?)";
+		try (Connection connection = this.getConnection();
+			 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+			preparedStatement.setInt(1, area.getAreaID());
+			preparedStatement.setString(3, String.valueOf(area.getStructureSchematic()));
+			preparedStatement.setString(4, area.getName());
+			preparedStatement.setString(5, GeneralMethods.locationToString(area.getSpawnPoint()));
+			preparedStatement.setString(6, area.getTasks().toString());
+		} catch (SQLException e) {
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to save area to storage!", e);
 		}
 	}
 
@@ -230,5 +244,26 @@ public class Storage {
 			this.disconnect();
 		}
 		return 0;
+	}
+
+	/**
+	 * Check if an area with that specific id already exists
+	 *
+	 * @param id ID to check
+	 * @return true if areaid already exists
+	 */
+	public boolean idForAreaExisting(int id) {
+		String query = "SELECT ID FROM areas WHERE id = ?";
+		this.connect();
+		try (Connection connection = this.getConnection();
+			 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+			preparedStatement.setInt(1, id);
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next();
+			}
+		} catch (SQLException e) {
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Failed to gather ID for area");
+		}
+		return false;
 	}
 }

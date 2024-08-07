@@ -1,23 +1,17 @@
 package org.bendersdestiny.playertutorials.manager;
 
 import lombok.Getter;
-import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bendersdestiny.playertutorials.tutorial.area.structure.Structure;
+import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPlayer;
+import org.bukkit.entity.Player;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.File;
 
+@Getter
 public class TutorialManager {
-	@Getter
 	private final Tutorial tutorial;
-	@Getter
-	private final BukkitRunnable task;
-
-	private final PlayerTutorials plugin;
-
-	@Getter
-	public static final Map<Integer, BukkitRunnable> activeTasks = new ConcurrentHashMap<>();
+	private final Player player;
 
 	/**
 	 * The {@link TutorialManager} manages the {@link Tutorial}. The {@link TutorialManager} starts
@@ -25,13 +19,10 @@ public class TutorialManager {
 	 * quits the {@link Tutorial} or quits the {@link org.bukkit.Server}.
 	 *
 	 * @param tutorial The tutorial to manage
-	 * @param task The runnable
-	 * @param plugin Plugin
 	 */
-	public TutorialManager(Tutorial tutorial, BukkitRunnable task, final PlayerTutorials plugin) {
+	public TutorialManager(Tutorial tutorial, final Player player) {
 		this.tutorial = tutorial;
-		this.task = task;
-		this.plugin = plugin;
+		this.player = player;
 	}
 
 	/**
@@ -39,10 +30,8 @@ public class TutorialManager {
 	 */
 	public void start() {
 		if (tutorial != null) {
-			if (task != null) {
-				activeTasks.put(task.getTaskId(), task);
-				task.runTaskAsynchronously(plugin);
-			}
+			StructureManager.loadStructure(new Structure(1, new File("BlaBla/schematic.schem"))); // TODO: Make IDs generate randomly
+			TutorialPlayer.getPlayer(player.getUniqueId());
 		}
 	}
 
@@ -51,8 +40,7 @@ public class TutorialManager {
 	 */
 	public void stop() {
 		if (tutorial != null) {
-			activeTasks.remove(task.getTaskId());
-			task.cancel();
+			TutorialPlayer.removePlayer(player.getUniqueId());
 		}
 	}
 }

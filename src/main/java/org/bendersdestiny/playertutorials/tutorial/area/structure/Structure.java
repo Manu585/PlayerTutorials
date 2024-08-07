@@ -1,8 +1,7 @@
-package org.bendersdestiny.playertutorials.tutorial.structure;
+package org.bendersdestiny.playertutorials.tutorial.area.structure;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 
 import java.io.File;
 
@@ -15,7 +14,9 @@ public class Structure {
     public Structure(int structureID, File structureSchematic) {
         this.structureID = structureID;
         this.structureSchematic = structureSchematic;
+    }
 
-        MemoryUtil.activeStructures.put(structureID, this);
+    public Structure(File structureSchematic) {
+        this.structureSchematic = structureSchematic;
     }
 }

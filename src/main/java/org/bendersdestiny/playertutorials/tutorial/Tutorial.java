@@ -4,9 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.tutorial.area.Area;
+import org.bukkit.Material;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 @Getter
@@ -15,18 +17,26 @@ public class Tutorial {
 	@Setter
 	private String name;
 	@Setter
-	private Map<Integer, Area> areas;
+	private Material icon;
+	@Setter
+	private List<Area> areas;
 
 	/**
 	 * Freshly created {@link Tutorial} constructor
 	 *
 	 * @param id Id of the tutorial
 	 * @param name Name of the tutorial
+	 * @param icon The icon display in the GUI
 	 */
-	public Tutorial(int id, String name) {
+	public Tutorial(int id, String name, @Nullable Material icon) {
 		this.id = id;
 		this.name = name;
-		this.areas = new ConcurrentHashMap<>();
+		if (icon == null) {
+			this.icon = Material.DIORITE;
+		} else {
+			this.icon = icon;
+		}
+		this.areas = new ArrayList<>();
 	}
 
 	/**
@@ -36,9 +46,10 @@ public class Tutorial {
 	 * @param name Name of the tutorial
 	 * @param areas Areas of the tutorial
 	 */
-	public Tutorial(int id, String name, Map<Integer, Area> areas) {
+	public Tutorial(int id, String name, Material icon, List<Area> areas) {
 		this.id = id;
 		this.name = name;
+		this.icon = icon;
 		this.areas = areas;
 	}
 
@@ -49,9 +60,9 @@ public class Tutorial {
 	 */
 	public void addArea(Area area) {
 		if (this.areas != null && area != null) {
-			this.areas.put(area.getId(), area);
+			this.areas.add(area);
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while adding a new area!");
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"An Error occurred while adding a new area!");
 		}
 	}
 
@@ -62,9 +73,9 @@ public class Tutorial {
 	 */
 	public void removeArea(Area area) {
 		if (this.areas != null && area != null) {
-			this.areas.remove(area.getId());
+			this.areas.remove(area);
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while removing a area!");
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"An Error occurred while removing an area!");
 		}
 	}
 }

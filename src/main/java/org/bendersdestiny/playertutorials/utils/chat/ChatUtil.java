@@ -6,6 +6,12 @@ import org.bendersdestiny.playertutorials.PlayerTutorials;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The {@link ChatUtil} class has the purpose to help with
+ * some basic formating issues. You are able to colorize
+ * messages with the {@link #format(String msg) format}
+ * method and do much more with the remaining methods.
+ */
 public class ChatUtil {
 	private final PlayerTutorials plugin;
 	private static final Pattern hexPattern = Pattern.compile("(&#)([a-fA-F0-9]{6})");
@@ -18,7 +24,7 @@ public class ChatUtil {
 	 * Format a {@link String} to be able to use
 	 * HEX colors and normal Minecraft {@link ChatColor}
 	 *
-	 * @param msg MSG to format
+	 * @param msg Message to format
 	 * @return formatted message
 	 */
 	public static String format(String msg) {

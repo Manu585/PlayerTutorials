@@ -2,9 +2,9 @@ package org.bendersdestiny.playertutorials;
 
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.configuration.ConfigManager;
-import org.bendersdestiny.playertutorials.listeners.AreaListener;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class PlayerTutorials extends JavaPlugin {
@@ -18,12 +18,11 @@ public final class PlayerTutorials extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		chatUtil = new ChatUtil(this);
+
 		new ConfigManager(this);
 		storage = new Storage(); // ConfigManager has to be initialized first
 
 		chatUtil.sendServerStartupMessage();
-
-		getServer().getPluginManager().registerEvents(new AreaListener(), this);
 	}
 
 	@Override
@@ -33,6 +32,12 @@ public final class PlayerTutorials extends JavaPlugin {
 		}
 		if (chatUtil != null) {
 			chatUtil.sendServerStopMessage();
+		}
+	}
+
+	void registerListeners(Listener... listeners) {
+		for (Listener listener : listeners) {
+			getServer().getPluginManager().registerEvents(listener, this);
 		}
 	}
 }

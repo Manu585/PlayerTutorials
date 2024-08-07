@@ -4,8 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class GeneralMethods {
@@ -17,7 +20,7 @@ public class GeneralMethods {
 	 * @param locationToTransform Location to transform
 	 * @return Location as String
 	 */
-	public static String locationToString(Location locationToTransform) {
+	public static @NotNull String locationToString(Location locationToTransform) {
 		if (locationToTransform != null && locationToTransform.getWorld() != null) {
 			String world = locationToTransform.getWorld().getName();
 			double x = locationToTransform.getX();
@@ -37,7 +40,8 @@ public class GeneralMethods {
 	 * @param stringToTransform String to transform
 	 * @return String as Location
 	 */
-	public static Location stringToLocation(String stringToTransform) {
+	@Contract("_ -> new")
+	public static @NotNull Location stringToLocation(@NotNull String stringToTransform) {
 		String[] parts = stringToTransform.split(",");
 		if (parts.length != 4) {
 			throw new IllegalArgumentException("Invalid location string format");
@@ -63,7 +67,7 @@ public class GeneralMethods {
 	 * @param world world from the blocks
 	 * @return all blocks in the area
 	 */
-	public static Set<Block> blocksInArea(Location PointA, Location PointB, World world) {
+	public static @NotNull Set<Block> blocksInArea(@NotNull Location PointA, @NotNull Location PointB, @NotNull World world) {
 		Set<Block> blocks = new HashSet<>();
 		for (int x = PointA.getBlockX(); x <= PointB.getBlockX(); x++) {
 			for (int y = PointA.getBlockY(); y <= PointB.getBlockY(); y++) {
@@ -73,5 +77,20 @@ public class GeneralMethods {
 			}
 		}
 		return blocks;
+	}
+
+	/**
+	 * Soul purpose of making duplicate ID entries impossible.
+	 *
+	 * @param idToValidate The ID to test
+	 * @param mapToCompare The Map to compare the ID to
+	 * @return The valid ID for the database
+	 */
+	@Contract(pure = true)
+	public static Integer validateID(int idToValidate, @NotNull Map mapToCompare) {
+		while (mapToCompare.containsKey(idToValidate)) {
+			idToValidate++;
+		}
+		return idToValidate;
 	}
 }
