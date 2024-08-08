@@ -261,10 +261,10 @@ public class MemoryUtil {
                 int priority     = resultSet.getInt("priority");
 
                 Task task = null;
-                for (String key : taskIDs.split(",")) // Check if there are tasks in the DB
+                for (String key : taskIDs.split(",")) // Check if there are tasks in the Table
                     task = createdTasks.get(Integer.parseInt(key));
 
-                if (task == null) { // If there aren't any tasks in the DB
+                if (task == null) { // If there aren't any tasks in the Table
                     Area noTasksArea = new Area(
                             areaID,
                             tutorialID,
@@ -275,7 +275,7 @@ public class MemoryUtil {
                             priority);
 
                     createdAreas.put(areaID, noTasksArea);
-                } else {
+                } else { // If there are tasks
                     Map<Integer, Task> tasks = new ConcurrentHashMap<>();
                     tasks.put(task.getPriority(), task);
 
