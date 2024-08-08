@@ -9,16 +9,18 @@ import org.bendersdestiny.playertutorials.tutorial.area.structure.Structure;
 import org.bendersdestiny.playertutorials.tutorial.task.Task;
 import org.bukkit.Location;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Map;
 import java.util.logging.Level;
 
 @Getter
-public class Area extends Structure {
+public class Area {
 	private final int areaID;
+	private int tutorialID;
 
 	@Setter
-	private File schematicFile;
+	private Structure structure;
 	@Setter
 	private String name;
 	@Setter
@@ -28,6 +30,16 @@ public class Area extends Structure {
 	@Setter
 	private int priority;
 
+	public Area(int areaID, int tutorialID, Structure structure, String name, Location spawnPoint, Map<Integer, Task> tasks, int priority) {
+		this.areaID = areaID;
+		this.tutorialID = tutorialID;
+		this.structure = structure;
+		this.name = name;
+		this.spawnPoint = spawnPoint;
+		this.tasks = tasks;
+		this.priority = priority;
+	}
+
 	/**
 	 * An {@link Area} is like the name implies an {@link Area} for a {@link Tutorial}.
 	 * Each {@link Area} has an ID, Name, Two {@link Location} to define the area with,
@@ -35,16 +47,15 @@ public class Area extends Structure {
 	 * are categorized in.
 	 *
 	 * @param areaID ID of the Area
-	 * @param schematicFile The schematic of the structure
+	 * @param structure The structure corresponding to the Area
 	 * @param name Name of the Area
 	 * @param spawnPoint Spawn point of the Area
 	 * @param tasks Tasks of the Area
 	 * @param priority Priority of the Area
 	 */
-	public Area(int areaID, File schematicFile, String name, Location spawnPoint, Map<Integer, Task> tasks, int priority) {
-		super(schematicFile);
+	public Area(int areaID, Structure structure, String name, Location spawnPoint, @Nullable Map<Integer, Task> tasks, int priority) {
 		this.areaID = areaID;
-		this.schematicFile = schematicFile;
+        this.structure = structure;
 		this.name = name;
 		this.spawnPoint = spawnPoint;
 		this.tasks = tasks;
@@ -75,5 +86,9 @@ public class Area extends Structure {
 		} else {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while removing a task!");
 		}
+	}
+
+	public void linkAreaToTutorial(int tutorialID) {
+
 	}
 }

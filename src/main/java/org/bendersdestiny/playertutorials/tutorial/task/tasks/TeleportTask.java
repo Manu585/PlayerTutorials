@@ -15,8 +15,8 @@ public class TeleportTask extends Task {
 	private Location from;
 	private Location to;
 
-	public TeleportTask(int priority, Location from, Location to) {
-		super("TeleportTask", priority);
+	public TeleportTask(int taskID, int areaID, int priority, Location from, Location to) {
+		super(taskID, areaID, "TeleportTask", priority);
 		this.from = from;
 		this.to = to;
 	}

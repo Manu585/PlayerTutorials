@@ -8,7 +8,9 @@ import org.bukkit.command.Command;
 
 @Getter
 public abstract class Task {
-	protected final String taskName;
+	protected final String taskType;
+	private final int taskID;
+	private final int areaID;
 
 	@Setter
 	private int priority;
@@ -18,11 +20,13 @@ public abstract class Task {
 	 * A console Task could be to teleport the {@link TutorialPlayer} to a specific location or another {@link Area}.
 	 * Whereas a player task could be to make the player execute a {@link Command} for example.
 	 *
-	 * @param taskName The name of the Task
+	 * @param taskType The name of the Task
 	 * @param priority Priority of the task
 	 */
-	public Task(String taskName, int priority) {
-		this.taskName = taskName;
+	public Task(int taskID, int areaID, String taskType, int priority) {
+		this.taskID = taskID;
+		this.areaID = areaID;
+		this.taskType = taskType;
 		this.priority = priority;
 	}
 }

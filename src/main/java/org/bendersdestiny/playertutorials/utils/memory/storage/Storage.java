@@ -42,8 +42,7 @@ public class Storage {
 			this.storageType = "sqlite";
 			this.setupSQLiteStorage();
 		}
-		this.createTutorialTable();
-		this.createAreaTable();
+		this.createAllTables();
 	}
 
 	/**
@@ -102,7 +101,7 @@ public class Storage {
 	 * @return the {@link Connection} object depending on storage type
 	 * @throws SQLException if there is any kind of error
 	 */
-	private Connection getConnection() throws SQLException {
+	public Connection getConnection() throws SQLException {
 		if (storageType.equalsIgnoreCase("sqlite")) {
 			return sqliteStorage.getConnection();
 		} else if (storageType.equalsIgnoreCase("mysql")) {
@@ -113,17 +112,27 @@ public class Storage {
 	}
 
 	/**
+	 * Helper method to create all necessary tables with
+	 */
+	private void createAllTables() {
+		this.createTutorialTable();
+		this.createAreaTable();
+		this.createStructuresTable();
+		this.createTasksTable();
+		this.createTeleportTaskTable();
+	}
+
+	/**
 	 * Creates the tutorial table for all created tutorials
 	 */
 	public void createTutorialTable() {
 		this.connect();
 		String query =
 				"CREATE TABLE IF NOT EXISTS tutorials (" +
-						"id INTEGER PRIMARY KEY AUTOINCREMENT," +
-						"areaid INTEGER," +
-						"name TEXT NOT NULL," +
-						"icon VARCHAR(41)," +
-						"FOREIGN KEY(areaid) REFERENCES areas(id))";
+						"id INTEGER PRIMARY KEY," +
+						"name VARCHAR(255) NOT NULL," +
+						"icon VARCHAR(41) DEFAULT 'DIORITE'" +
+						")";
 		try (Connection connection = this.getConnection();
 			 Statement statement = connection.createStatement()) {
 			statement.execute(query);
@@ -141,15 +150,15 @@ public class Storage {
         this.connect();
         String query =
 				"CREATE TABLE IF NOT EXISTS areas (" +
-						"areaid INTEGER PRIMARY KEY," +
-						"tutorial_id INTEGER," +
-						"task_id INTEGER," +
-						"schematic VARCHAR," +
-						"areaname TEXT NOT NULL," +
-						"spawnpoint TEXT NOT NULL," +
-						"tasks TEXT NOT NULL," +
-						"FOREIGN KEY(tutorial_id) REFERENCES tutorials(id)" +
-						"FOREIGN KEY(task_id) REFERENCES tasks(id))";
+						"areaID INTEGER PRIMARY KEY," +
+						"tutorialID INTEGER," +
+						"structureID INTEGER," +
+						"name VARCHAR(255)," +
+						"spawnPoint TEXT," +
+						"tasks TEXT," +
+						"priority INTEGER," +
+						"FOREIGN KEY(tutorialID) REFERENCES tutorials(id)" +
+						")";
         try (Connection connection = this.getConnection();
              Statement statement = connection.createStatement()) {
             statement.execute(query);
@@ -161,14 +170,38 @@ public class Storage {
     }
 
 	/**
+	 * Creates the structure table
+	 */
+	public void createStructuresTable() {
+		this.connect();
+		String query =
+				"CREATE TABLE IF NOT EXISTS structures (" +
+						"structureID INTEGER PRIMARY KEY," +
+						"areaID INTEGER," +
+						"schematic TEXT," +
+						"FOREIGN KEY(areaID) REFERENCES areas(areaID" +
+						")";
+		try (Connection connection = this.getConnection();
+			 Statement statement = connection.createStatement()) {
+			statement.execute(query);
+		} catch (SQLException e) {
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create structures table!", e);
+		}
+	}
+
+	/**
 	 * Creates the tasks table
 	 */
 	public void createTasksTable() {
 		this.connect();
 		String query =
 				"CREATE TABLE IF NOT EXISTS tasks (" +
-						"tasktype VARCHAR," +
-						"taskpriority INTEGER)";
+						"taskID INTEGER PRIMARY KEY," +
+						"areaID INTEGER," +
+						"type VARCHAR(50)," + // 'CommandTask' or 'TeleportTask' or ...
+						"priority INTEGER," +
+						"FOREIGN KEY(areaID) REFERENCES areas(areaID)" +
+						")";
 		try (Connection connection = this.getConnection();
 			 Statement statement = connection.createStatement()) {
 			statement.execute(query);
@@ -185,17 +218,18 @@ public class Storage {
 	public void createTeleportTaskTable() {
 		this.connect();
 		String query =
-				"CREATE TABLE IF NOT EXISTS teleporttasks (" +
-						"id INTEGER PRIMARY KEY AUTOINCREMENT" +
-						"areaid INTEGER," +
-						"from DOUBLE," +
-						"to DOUBLE" +
-						"FOREIGN KEY(areaid) REFERENCES areas(id)";
+				"CREATE TABLE IF NOT EXISTS teleport_tasks (" +
+						"taskID INTEGER PRIMARY KEY," +
+						"fromLocation TEXT," +
+						"toLocation TEXT," +
+						"priority INTEGER," +
+						"FOREIGN KEY(taskID) REFERENCES tasks(taskID)" +
+						")";
 		try (Connection connection = this.getConnection();
 			Statement statement = connection.createStatement()) {
 			statement.execute(query);
 		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create teleporttask table!", e);
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create teleport tasks table!", e);
 		} finally {
 			this.disconnect();
 		}
@@ -212,7 +246,7 @@ public class Storage {
 		try (Connection connection = this.getConnection();
 			 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 			preparedStatement.setInt(1, area.getAreaID());
-			preparedStatement.setString(3, String.valueOf(area.getStructureSchematic()));
+			preparedStatement.setString(3, String.valueOf(area.getStructure().getStructureSchematic()));
 			preparedStatement.setString(4, area.getName());
 			preparedStatement.setString(5, GeneralMethods.locationToString(area.getSpawnPoint()));
 			preparedStatement.setString(6, area.getTasks().toString());

@@ -9,10 +9,9 @@ public class CommandTask extends Task {
 	private String requiredCommand;
 	private String executedCommand;
 
-	public CommandTask(int priority, String requiredCommand, String executedCommand) {
-		super("CommandTask", priority);
+	public CommandTask(int taskID, int areaID, int priority,String requiredCommand) {
+		super(taskID, areaID,  "CommandTask", priority);
 		this.requiredCommand = requiredCommand;
-		this.executedCommand = executedCommand;
 	}
 
 	public boolean validateCommand() {

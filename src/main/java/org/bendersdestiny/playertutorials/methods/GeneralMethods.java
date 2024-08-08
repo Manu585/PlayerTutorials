@@ -1,5 +1,7 @@
 package org.bendersdestiny.playertutorials.methods;
 
+import org.bendersdestiny.playertutorials.tutorial.task.Task;
+import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,8 +22,8 @@ public class GeneralMethods {
 	 * @param locationToTransform Location to transform
 	 * @return Location as String
 	 */
-	public static @NotNull String locationToString(Location locationToTransform) {
-		if (locationToTransform != null && locationToTransform.getWorld() != null) {
+	public static @NotNull String locationToString(@NotNull Location locationToTransform) {
+		if (locationToTransform.getWorld() != null) {
 			String world = locationToTransform.getWorld().getName();
 			double x = locationToTransform.getX();
 			double y = locationToTransform.getY();
@@ -87,10 +89,32 @@ public class GeneralMethods {
 	 * @return The valid ID for the database
 	 */
 	@Contract(pure = true)
-	public static Integer validateID(int idToValidate, @NotNull Map mapToCompare) {
+	public static Integer validateID(int idToValidate, Map<Integer, Task> mapToCompare) {
 		while (mapToCompare.containsKey(idToValidate)) {
 			idToValidate++;
 		}
 		return idToValidate;
+	}
+
+	public static int generateID(String type) {
+        return switch (type) {
+            case "Tutorial" -> createID(MemoryUtil.createdTutorials);
+            case "Area" -> createID(MemoryUtil.createdAreas);
+            case "Structure" -> createID(MemoryUtil.createdStructures);
+			case "Task" -> createID(MemoryUtil.createdTasks);
+            default -> -1;
+        };
+    }
+
+	public static int createID(Map mapToCompare) {
+		int generatedID = 1;
+		if (mapToCompare != null) {
+			while (mapToCompare.containsKey(generatedID)) {
+				generatedID++;
+			}
+			return generatedID;
+		} else {
+			return -1;
+		}
 	}
 }
