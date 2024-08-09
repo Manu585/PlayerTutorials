@@ -26,6 +26,10 @@ public abstract class BaseItem {
 		this.createItem();
 	}
 
+	/**
+	 * Creates the item and
+	 * set its {@link ItemMeta}
+	 */
 	private void createItem() {
 		ItemMeta meta = this.item.getItemMeta();
 		if (meta != null) {

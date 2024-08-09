@@ -21,7 +21,10 @@ public final class PlayerTutorials extends JavaPlugin {
 		chatUtil = new ChatUtil(this);
 
 		new ConfigManager(this);
+
 		storage = new Storage(); // ConfigManager has to be initialized first
+
+		this.loadEverythingAsync();
 
 		chatUtil.sendServerStartupMessage();
 	}
@@ -34,20 +37,41 @@ public final class PlayerTutorials extends JavaPlugin {
 		if (chatUtil != null) {
 			chatUtil.sendServerStopMessage();
 		}
-
-		saveEverything();
+		this.saveEverythingAsync();
 	}
 
-	void registerListeners(Listener... listeners) {
+	/**
+	 * Registers all {@link Listener} in the {@link java.util.List}
+	 *
+	 * @param listeners Listeners List
+	 */
+	private void registerListeners(Listener... listeners) {
 		for (Listener listener : listeners) {
 			getServer().getPluginManager().registerEvents(listener, this);
 		}
 	}
 
-	void saveEverything() {
+	/**
+	 * Saves every {@link org.bendersdestiny.playertutorials.tutorial.Tutorial}, {@link org.bendersdestiny.playertutorials.tutorial.area.Area}
+	 * {@link org.bendersdestiny.playertutorials.tutorial.task.Task} and {@link org.bendersdestiny.playertutorials.tutorial.area.structure.Structure}
+	 * on an async thread. Uses methods from {@link StorageManager} to save.
+	 */
+	private void saveEverythingAsync() {
 		StorageManager.saveAllTutorialsAsync();
 		StorageManager.saveAllAreasAsync();
 		StorageManager.saveAllTasksAsync();
 		StorageManager.saveAllStructuresAsync();
+	}
+
+	/**
+	 * Loads every {@link org.bendersdestiny.playertutorials.tutorial.Tutorial}, {@link org.bendersdestiny.playertutorials.tutorial.area.Area}
+	 * {@link org.bendersdestiny.playertutorials.tutorial.task.Task} and {@link org.bendersdestiny.playertutorials.tutorial.area.structure.Structure}
+	 * on an async thread. Uses methods from {@link StorageManager} to load.
+	 */
+	private void loadEverythingAsync() {
+		StorageManager.loadAllTutorialsAsync();
+		StorageManager.loadAllAreasAsync();
+		StorageManager.loadAllTasksAsync();
+		StorageManager.loadAllStructuresAsync();
 	}
 }

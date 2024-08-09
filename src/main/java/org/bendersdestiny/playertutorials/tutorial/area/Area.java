@@ -3,7 +3,6 @@ package org.bendersdestiny.playertutorials.tutorial.area;
 import lombok.Getter;
 import lombok.Setter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
-import org.bendersdestiny.playertutorials.methods.GeneralMethods;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
 import org.bendersdestiny.playertutorials.tutorial.area.structure.Structure;
 import org.bendersdestiny.playertutorials.tutorial.task.Task;
@@ -13,9 +12,7 @@ import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bukkit.Location;
 
 import javax.annotation.Nullable;
-import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 @Getter
@@ -33,6 +30,8 @@ public class Area {
 	private List<Task> tasks;
 	@Setter
 	private int priority;
+
+	public static String areaColor = "&#82c238";
 
 	public Area(int areaID, int tutorialID, Structure structure, String name, Location spawnPoint, List<Task> tasks, int priority) {
 		this.areaID = areaID;
@@ -109,9 +108,5 @@ public class Area {
 		} else {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while removing a task!");
 		}
-	}
-
-	public void linkAreaToTutorial(int tutorialID) {
-
 	}
 }

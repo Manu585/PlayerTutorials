@@ -20,6 +20,12 @@ public class TutorialPlayer {
 		this.player = Bukkit.getPlayer(uuid);
 	}
 
+	/**
+	 * Remove a {@link TutorialPlayer} from
+	 * the {@link #PLAYERS} {@link Map}
+	 *
+	 * @param uuid {@link UUID} of the {@link Player} to remove
+	 */
 	public static void removePlayer(UUID uuid) {
 		if (PLAYERS.containsKey(uuid)) {
 			PLAYERS.remove(uuid);
@@ -28,6 +34,13 @@ public class TutorialPlayer {
 		}
 	}
 
+	/**
+	 * Gets an existing {@link TutorialPlayer} or creates a
+	 * new one.
+	 *
+	 * @param uuid {@link UUID} of the {@link Player} to get
+	 * @return The {@link TutorialPlayer}
+	 */
 	public static TutorialPlayer getPlayer(UUID uuid) {
 		if (PLAYERS.containsKey(uuid)) {
 			return PLAYERS.get(uuid);
@@ -37,6 +50,11 @@ public class TutorialPlayer {
 		throw new NullPointerException("Player " + uuid + " is not registered");
 	}
 
+	/**
+	 * Register the player into the {@link #PLAYERS} {@link Map}
+	 *
+	 * @param player {@link TutorialPlayer} to register
+	 */
 	public static void registerPlayer(TutorialPlayer player) {
 		PLAYERS.put(player.getUuid(), player);
 	}

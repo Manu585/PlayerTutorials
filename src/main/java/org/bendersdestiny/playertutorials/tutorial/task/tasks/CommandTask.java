@@ -13,14 +13,4 @@ public class CommandTask extends Task {
 		super(taskID, areaID,  "CommandTask", priority);
 		this.requiredCommand = requiredCommand;
 	}
-
-	public boolean validateCommand() {
-		if (requiredCommand != null && !requiredCommand.isEmpty() && executedCommand != null && !executedCommand.isEmpty()) {
-			String formattedRequiredCommand = requiredCommand.toLowerCase();
-			String formattedExecutedCommand = executedCommand.toLowerCase();
-
-			return formattedRequiredCommand.equals(formattedExecutedCommand);
-		}
-		return false;
-	}
 }

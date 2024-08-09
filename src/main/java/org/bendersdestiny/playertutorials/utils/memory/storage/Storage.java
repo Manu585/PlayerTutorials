@@ -67,8 +67,8 @@ public class Storage {
 		String username = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.username");
 		String password = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.password");
 		String database = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.database");
-		String host 	= ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.host");
-		String port 	= ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.port");
+		String host = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.host");
+		String port = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.port");
 
 		mySQLStorage = MySQLStorage.getInstance(username, password, port, host, database);
 	}
@@ -257,68 +257,16 @@ public class Storage {
 	}
 
 	/**
-	 * Save an area to the DB
-	 *
-	 * @param area Area to save
+	 * Test class to test at home
 	 */
-	public void saveArea(Area area) {
-		this.connect();
-		String query = "INSERT INTO areas (areaid, schematicfile, name, spawnpoint, tasks, priority) VALUES (?, ?, ?, ?, ?, ?)";
-		try (Connection connection = this.getConnection();
-			 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-			preparedStatement.setInt(1, area.getAreaID());
-			preparedStatement.setString(3, String.valueOf(area.getStructure().getStructureSchematic()));
-			preparedStatement.setString(4, area.getName());
-			preparedStatement.setString(5, GeneralMethods.locationToString(area.getSpawnPoint()));
-			preparedStatement.setString(6, area.getTasks().toString());
-		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to save area to storage!", e);
-		}
+	static class StorageSaver {
+
 	}
 
 	/**
-	 * Get the ID for the corresponding Area
-	 *
-	 * @param areaName The Name of the area
-	 * @return the areas ID
+	 * Test class to test at home
 	 */
-	public int getIdForArea(String areaName) {
-		String query = "SELECT id FROM areas WHERE name = ?";
-		this.connect();
-		try (Connection connection = this.getConnection();
-			 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-			preparedStatement.setString(1, areaName);
-			try (ResultSet resultSet = preparedStatement.executeQuery()) {
-				if (resultSet.next()) {
-					return resultSet.getInt(1);
-				}
-			}
-		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Failed to gather ID for area");
-		} finally {
-			this.disconnect();
-		}
-		return 0;
-	}
+	static class StorageLoader {
 
-	/**
-	 * Check if an area with that specific id already exists
-	 *
-	 * @param id ID to check
-	 * @return true if areaid already exists
-	 */
-	public boolean idForAreaExisting(int id) {
-		String query = "SELECT ID FROM areas WHERE id = ?";
-		this.connect();
-		try (Connection connection = this.getConnection();
-			 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-			preparedStatement.setInt(1, id);
-			try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                return resultSet.next();
-			}
-		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Failed to gather ID for area");
-		}
-		return false;
 	}
 }

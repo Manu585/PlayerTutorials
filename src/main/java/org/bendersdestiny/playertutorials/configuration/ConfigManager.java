@@ -14,6 +14,9 @@ public class ConfigManager {
 		configCheck();
 	}
 
+	/**
+	 * Puts values into the {@link Config}
+	 */
 	private void configCheck() {
 		FileConfiguration config = defaultConfig.get();
 		config.addDefault("playertutorials.storage.type", "sqlite");

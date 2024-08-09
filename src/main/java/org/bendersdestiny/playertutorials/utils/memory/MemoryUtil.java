@@ -76,6 +76,8 @@ public class MemoryUtil {
      * Saves all {@link Area} to the Database
      */
     public static void saveAreas() {
+        long startTime = System.currentTimeMillis();
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Saving " + Area.areaColor + "Areas &7..."));
         String query = "INSERT INTO areas VALUES(?,?,?,?,?,?)";
         try (Connection connection = storage.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -87,7 +89,8 @@ public class MemoryUtil {
                 preparedStatement.setString(5, GeneralMethods.locationToString(area.getSpawnPoint()));
                 preparedStatement.setInt(6, area.getPriority());
             }
-            PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all Areas");
+            PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all " + Area.areaColor + "Areas &7in &a" +
+                    ((System.currentTimeMillis() - startTime) / 1000) + " &7seconds");
         } catch (SQLException e) {
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save areas", e.getMessage());
         } finally {
@@ -110,6 +113,8 @@ public class MemoryUtil {
      * Saves all {@link Task} to the Database
      */
     private static void saveGeneralTasks() {
+        long startTime = System.currentTimeMillis();
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Saving " + Task.taskColor + "Tasks &7..."));
         String query = "INSERT INTO tasks VALUES(?,?,?,?)";
         try (Connection connection = storage.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -120,7 +125,8 @@ public class MemoryUtil {
                 preparedStatement.setInt(4, task.getPriority());
                 preparedStatement.executeUpdate();
             }
-            PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all Tasks");
+            PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("Successfully saved all " + Task.taskColor + "Tasks &7in &a" +
+                    (System.currentTimeMillis() - startTime) / 1000 + " &7seconds"));
         } catch (SQLException e) {
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save tasks", e.getMessage());
         } finally {
@@ -224,22 +230,22 @@ public class MemoryUtil {
      */
     public static void loadAreas() {
         long loadingStartTime = System.currentTimeMillis();
-        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Loading &8Areas..."));
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Loading " + Area.areaColor + "Areas&7..."));
         storage.connect();
         String query = "SELECT * FROM areas";
         try (Connection connection = storage.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                int areaID       = resultSet.getInt("areaID");
-                int tutorialID   = resultSet.getInt("tutorialID");
-                int structureID  = resultSet.getInt("structureID");
-                String areaName  = resultSet.getString("name");
+            while (resultSet.next()) { // Get all fields from columns
                 String areaSpawn = resultSet.getString("spawnpoint");
-                String taskIDs   = resultSet.getString("tasks");
-                int priority     = resultSet.getInt("priority");
+                int structureID = resultSet.getInt("structureID");
+                int tutorialID = resultSet.getInt("tutorialID");
+                String areaName = resultSet.getString("name");
+                String taskIDs = resultSet.getString("tasks");
+                int priority = resultSet.getInt("priority");
+                int areaID = resultSet.getInt("areaID");
 
-                Task task = null;
+                Task task = null; // Initiate empty Task
                 for (String key : taskIDs.split(",")) // Check if there are tasks in the Table
                     task = createdTasks.get(Integer.parseInt(key));
 
@@ -270,8 +276,8 @@ public class MemoryUtil {
                     createdAreas.put(areaID, area);
                 }
             }
-            PlayerTutorials.getInstance().getLogger().log(Level.FINE, ChatUtil.format("&7Successfully loaded all &8Areas&7! \n" +
-                    "&8Areas &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
+            PlayerTutorials.getInstance().getLogger().log(Level.FINE, ChatUtil.format("&7Successfully loaded all " + Area.areaColor + "Areas&7! \n" +
+                    Area.areaColor + "Areas &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
         } catch (SQLException e) {
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load all areas! " + e.getMessage());
         } finally {
@@ -286,7 +292,7 @@ public class MemoryUtil {
      */
     public static void loadTasks() {
         long loadingStartTime = System.currentTimeMillis();
-        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Loading &dTasks..."));
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Loading " + Task.taskColor + "Tasks&7..."));
         storage.connect();
         String query = "SELECT * FROM tasks";
         try (Connection connection = storage.getConnection();
@@ -308,8 +314,8 @@ public class MemoryUtil {
                         break;
                 }
             }
-            PlayerTutorials.getInstance().getLogger().log(Level.FINE, ChatUtil.format("&7Successfully loaded all &dTasks&7! \n" +
-                    "&dStructures &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
+            PlayerTutorials.getInstance().getLogger().log(Level.FINE, ChatUtil.format("&7Successfully loaded all " + Task.taskColor + "Tasks&7! \n" +
+                    Task.taskColor + "Tasks &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
         } catch (SQLException e) {
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load tasks! " + e.getMessage());
         } finally {

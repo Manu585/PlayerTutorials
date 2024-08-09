@@ -21,6 +21,12 @@ public class TeleportTask extends Task {
 		this.to = to;
 	}
 
+	/**
+	 * Teleports the {@link Player} to
+	 * the {@link #to} {@link Location}
+	 *
+	 * @param player {@link Player} to TP
+	 */
 	public void teleportPlayerToNewLocation(Player player) {
 		if (player != null) {
 			player.teleport(to);
@@ -29,6 +35,12 @@ public class TeleportTask extends Task {
 		}
 	}
 
+	/**
+	 * Resets the {@link Player} to
+	 * the {@link #from} {@link Location}
+	 *
+	 * @param player {@link Player} to TP
+	 */
 	public void resetPlayerToOldLocation(Player player){
 		if (player != null) {
 			player.teleport(from);

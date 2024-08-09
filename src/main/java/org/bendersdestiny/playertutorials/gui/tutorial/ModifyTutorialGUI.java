@@ -1,4 +1,3 @@
 package org.bendersdestiny.playertutorials.gui.tutorial;
 
-public class ModifyTutorialGUI {
-}
+public class ModifyTutorialGUI {}

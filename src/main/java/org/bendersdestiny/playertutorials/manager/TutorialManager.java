@@ -31,7 +31,6 @@ public class TutorialManager {
 	 */
 	public void start() {
 		if (tutorial != null) {
-			StructureManager.loadStructure(MemoryUtil.createdStructures.get(area.getAreaID()));
 			TutorialPlayer.getPlayer(player.getUniqueId());
 		}
 	}

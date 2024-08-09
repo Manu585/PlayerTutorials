@@ -16,6 +16,12 @@ public class Config {
 	private final FileConfiguration config;
 	private final PlayerTutorials plugin;
 
+	/**
+	 * Creates a new Config file
+	 *
+	 * @param plugin Plugin instance
+	 * @param fileName Name of the file
+	 */
 	public Config(PlayerTutorials plugin, String fileName) {
 		this.plugin = plugin;
 
@@ -43,6 +49,9 @@ public class Config {
 		this.reload();
 	}
 
+	/**
+	 * Reloads the {@link Config}
+	 */
 	public void reload() {
 		try {
 			config.load(configFile);
@@ -51,6 +60,9 @@ public class Config {
 		}
 	}
 
+	/**
+	 * Saves the {@link Config}
+	 */
 	public void save() {
 		try {
 			config.options().copyDefaults(true);
@@ -60,6 +72,11 @@ public class Config {
 		}
 	}
 
+	/**
+	 * Get the {@link FileConfiguration}
+	 *
+	 * @return the {@link FileConfiguration}
+	 */
 	public FileConfiguration get() {
 		return this.config;
 	}

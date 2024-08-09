@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.tutorial.area.Area;
-import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bukkit.Material;
 
 import javax.annotation.Nullable;
@@ -22,7 +21,7 @@ public class Tutorial {
 	@Setter
 	private List<Area> areas;
 
-	public static String tutorialColor = ChatUtil.format("&#F2B152");
+	public static String tutorialColor = "&#F2B152";
 
 	/**
 	 * Freshly created {@link Tutorial} constructor
@@ -59,7 +58,7 @@ public class Tutorial {
 	/**
 	 * Add an {@link Area} to a {@link Tutorial}
 	 *
-	 * @param area Area to add
+	 * @param area {@link Area} to add
 	 */
 	public void addArea(Area area) {
 		if (this.areas != null && area != null) {
@@ -72,7 +71,7 @@ public class Tutorial {
 	/**
 	 * Remove an {@link Area} from a {@link Tutorial}
 	 *
-	 * @param area Area to remove
+	 * @param area {@link Area} to remove
 	 */
 	public void removeArea(Area area) {
 		if (this.areas != null && area != null) {

@@ -9,11 +9,14 @@ import org.bukkit.command.Command;
 @Getter
 public abstract class Task {
 	protected final String taskType;
+
 	private final int taskID;
 	private final int areaID;
 
 	@Setter
 	private int priority;
+
+	public static String taskColor = "#ed28b2";
 
 	/**
 	 * A {@link Task} is like the name implies, a task which has to be executed by a player or the console.

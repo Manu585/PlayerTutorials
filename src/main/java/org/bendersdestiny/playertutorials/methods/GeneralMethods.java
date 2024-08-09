@@ -1,7 +1,7 @@
 package org.bendersdestiny.playertutorials.methods;
 
-import org.bendersdestiny.playertutorials.tutorial.task.Task;
-import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
+import org.bendersdestiny.playertutorials.PlayerTutorials;
+import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -9,9 +9,12 @@ import org.bukkit.block.Block;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 public class GeneralMethods {
 
@@ -82,39 +85,31 @@ public class GeneralMethods {
 	}
 
 	/**
-	 * Soul purpose of making duplicate ID entries impossible.
+	 * Create the ID for the tutorials table
+	 * It will check for all existing IDs and
+	 * keeps on generating until it has one
+	 * which is not in the database.
 	 *
-	 * @param idToValidate The ID to test
-	 * @param mapToCompare The Map to compare the ID to
-	 * @return The valid ID for the database
+	 * @param storage Storage instance
+	 * @return The ID for the tutorials table
 	 */
-	@Contract(pure = true)
-	public static Integer validateID(int idToValidate, Map<Integer, Task> mapToCompare) {
-		while (mapToCompare.containsKey(idToValidate)) {
-			idToValidate++;
-		}
-		return idToValidate;
-	}
-
-	public static int generateID(String type) {
-        return switch (type) {
-            case "Tutorial" -> createID(MemoryUtil.createdTutorials);
-            case "Area" -> createID(MemoryUtil.createdAreas);
-            case "Structure" -> createID(MemoryUtil.createdStructures);
-			case "Task" -> createID(MemoryUtil.createdTasks);
-            default -> -1;
-        };
-    }
-
-	public static int createID(Map mapToCompare) {
-		int generatedID = 1;
-		if (mapToCompare != null) {
-			while (mapToCompare.containsKey(generatedID)) {
-				generatedID++;
+	public static int createTutorialsID(Storage storage) { //TODO: Not finished yet, just a WIP version
+		storage.connect();
+		String query = "SELECT id FROM tutorials";
+		try (Connection connection = storage.getConnection();
+			 Statement statement = connection.createStatement()) {
+			statement.execute(query);
+			int tutorialsID = statement.getResultSet().getInt(1);
+			int id = 1;
+			while (tutorialsID == id) {
+				id++;
 			}
-			return generatedID;
-		} else {
-			return -1;
+			return id;
+        } catch (SQLException e) {
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't create random tutorial ID");
+		} finally {
+			storage.disconnect();
 		}
+		throw new NullPointerException("Failed to create tutorials ID");
 	}
 }

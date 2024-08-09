@@ -17,6 +17,8 @@ public class Structure {
     private int areaID;
     private File structureSchematic;
 
+    public static String structureColor = "#2863ed";
+
     /**
      * Create a structure which already existed
      * in the db with its own unique ID.
@@ -28,21 +30,6 @@ public class Structure {
     public Structure(int structureID, int areaID, File structureSchematic) {
         this.structureID = structureID;
         this.areaID = areaID;
-        this.structureSchematic = structureSchematic;
-    }
-
-    public Structure(int areaID, File structureSchematic) {
-        this.areaID = areaID;
-        this.structureSchematic = structureSchematic;
-    }
-
-    /**
-     * Create first structure with a schematic file
-     * and save it to the DB.
-     *
-     * @param structureSchematic The path to the .schem file
-     */
-    public Structure(File structureSchematic) {
         this.structureSchematic = structureSchematic;
     }
 }

@@ -31,6 +31,9 @@ public class TutorialsGUI implements InventoryHolder {
         this.createInventory();
     }
 
+    /**
+     * Creates the {@link Inventory}
+     */
     private void createInventory() {
         inventory = Bukkit.createInventory(holder, rows * 9, inventoryTitle);
 
