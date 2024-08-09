@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.tutorial.area.Area;
+import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bukkit.Material;
 
 import javax.annotation.Nullable;
@@ -20,6 +21,8 @@ public class Tutorial {
 	private Material icon;
 	@Setter
 	private List<Area> areas;
+
+	public static String tutorialColor = ChatUtil.format("&#F2B152");
 
 	/**
 	 * Freshly created {@link Tutorial} constructor

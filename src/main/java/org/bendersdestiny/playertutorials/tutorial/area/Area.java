@@ -7,10 +7,14 @@ import org.bendersdestiny.playertutorials.methods.GeneralMethods;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
 import org.bendersdestiny.playertutorials.tutorial.area.structure.Structure;
 import org.bendersdestiny.playertutorials.tutorial.task.Task;
+import org.bendersdestiny.playertutorials.tutorial.task.tasks.CommandTask;
+import org.bendersdestiny.playertutorials.tutorial.task.tasks.TeleportTask;
+import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bukkit.Location;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -26,11 +30,11 @@ public class Area {
 	@Setter
 	private Location spawnPoint;
 	@Setter
-	private Map<Integer, Task> tasks;
+	private List<Task> tasks;
 	@Setter
 	private int priority;
 
-	public Area(int areaID, int tutorialID, Structure structure, String name, Location spawnPoint, Map<Integer, Task> tasks, int priority) {
+	public Area(int areaID, int tutorialID, Structure structure, String name, Location spawnPoint, List<Task> tasks, int priority) {
 		this.areaID = areaID;
 		this.tutorialID = tutorialID;
 		this.structure = structure;
@@ -53,7 +57,7 @@ public class Area {
 	 * @param tasks Tasks of the Area
 	 * @param priority Priority of the Area
 	 */
-	public Area(int areaID, Structure structure, String name, Location spawnPoint, @Nullable Map<Integer, Task> tasks, int priority) {
+	public Area(int areaID, Structure structure, String name, Location spawnPoint, @Nullable List<Task> tasks, int priority) {
 		this.areaID = areaID;
         this.structure = structure;
 		this.name = name;
@@ -69,7 +73,17 @@ public class Area {
 	 */
 	public void addTask(Task task) {
 		if (tasks != null) {
-			tasks.put(GeneralMethods.validateID(1, tasks), task);
+			tasks.add(task);
+			MemoryUtil.createdTasks.put(task.getTaskID(), task);
+			switch (task.getTaskType()) {
+				case "CommandTask":
+					MemoryUtil.createdCommandTasks.put(task.getTaskID(), (CommandTask) task);
+					break;
+				case "TeleportTask":
+					MemoryUtil.createdTeleportTasks.put(task.getTaskID(), (TeleportTask) task);
+					break;
+			}
+			MemoryUtil.createdTasks.put(task.getTaskID(), task);
 		} else {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while adding a new task!");
 		}
@@ -83,6 +97,15 @@ public class Area {
 	public void removeTask(Task task) {
 		if (tasks != null) {
 			tasks.remove(task.getPriority());
+			MemoryUtil.createdTasks.remove(task.getTaskID());
+			switch (task.getTaskType()) {
+				case "CommandTask":
+					MemoryUtil.createdCommandTasks.remove(task.getTaskID());
+					break;
+				case "TeleportTask":
+					MemoryUtil.createdTeleportTasks.remove(task.getTaskID());
+					break;
+			}
 		} else {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while removing a task!");
 		}

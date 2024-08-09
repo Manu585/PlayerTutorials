@@ -119,6 +119,7 @@ public class Storage {
 		this.createAreaTable();
 		this.createStructuresTable();
 		this.createTasksTable();
+		this.createCommandTaskTable();
 		this.createTeleportTaskTable();
 	}
 
@@ -197,9 +198,9 @@ public class Storage {
 		String query =
 				"CREATE TABLE IF NOT EXISTS tasks (" +
 						"taskID INTEGER PRIMARY KEY," +
-						"areaID INTEGER," +
-						"type VARCHAR(50)," + // 'CommandTask' or 'TeleportTask' or ...
-						"priority INTEGER," +
+						"areaID INTEGER NOT NULL," +
+						"type VARCHAR(50 NOT NULL)," + // 'CommandTask' or 'TeleportTask' or ...
+						"priority INTEGER NOT NULL," +
 						"FOREIGN KEY(areaID) REFERENCES areas(areaID)" +
 						")";
 		try (Connection connection = this.getConnection();
@@ -222,7 +223,6 @@ public class Storage {
 						"taskID INTEGER PRIMARY KEY," +
 						"fromLocation TEXT," +
 						"toLocation TEXT," +
-						"priority INTEGER," +
 						"FOREIGN KEY(taskID) REFERENCES tasks(taskID)" +
 						")";
 		try (Connection connection = this.getConnection();
@@ -230,6 +230,27 @@ public class Storage {
 			statement.execute(query);
 		} catch (SQLException e) {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create teleport tasks table!", e);
+		} finally {
+			this.disconnect();
+		}
+	}
+
+	/**
+	 * Create the command tasks table
+	 */
+	public void createCommandTaskTable() {
+		this.connect();
+		String query =
+				"CREATE TABLE IF NOT EXISTS command_tasks (" +
+						"taskID INTEGER PRIMARY KEY," +
+						"required_command TEXT," +
+						"FOREIGN KEY(taskID) REFERENCES tasks(taskID)" +
+						")";
+		try (Connection connection = this.getConnection();
+			 Statement statement = connection.createStatement()) {
+			statement.execute(query);
+		} catch (SQLException e) {
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create command tasks table!", e);
 		} finally {
 			this.disconnect();
 		}

@@ -20,6 +20,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -42,11 +44,17 @@ public class MemoryUtil {
     public static Map<Integer, Structure> createdStructures = new ConcurrentHashMap<>();
     @Getter
     public static Map<Integer, Task> createdTasks = new ConcurrentHashMap<>();
+    @Getter
+    public static Map<Integer, TeleportTask> createdTeleportTasks = new ConcurrentHashMap<>();
+    @Getter
+    public static Map<Integer, CommandTask> createdCommandTasks = new ConcurrentHashMap<>();
 
     /**
      * Saves all {@link Tutorial} to the Database
      */
     public static void saveTutorials() {
+        long startTime = System.currentTimeMillis();
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Saving " + Tutorial.tutorialColor + "Tutorials &7..."));
         String query = "INSERT INTO tutorials VALUES(?,?,?)";
         try (Connection connection = storage.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -55,9 +63,10 @@ public class MemoryUtil {
                 preparedStatement.setString(2, tutorial.getName());
                 preparedStatement.setString(3, tutorial.getIcon().toString());
             }
-            PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all Tutorials");
+            PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Successfully saved all "  + Tutorial.tutorialColor + "&6Tutorials &7in &a" +
+                    ((System.currentTimeMillis() - startTime) / 1000) + " &7seconds"));
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save tutorials", e.getMessage());
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("Couldn't save " + Tutorial.tutorialColor + "tutorials"), e.getMessage());
         } finally {
             storage.disconnect();
         }
@@ -87,10 +96,21 @@ public class MemoryUtil {
     }
 
     /**
-     * Saves all {@link Task} to the Database
+     * Main task saving method with the sub task saving methods
+     * like {@link #saveGeneralTasks()}, {@link #saveCommandTasks()}
+     * or {@link #saveTeleportTasks()}
      */
     public static void saveTasks() {
-        String query = "INSERT INTO tasks VALUES(?,?,?,?,?,?)";
+        saveGeneralTasks();
+        saveCommandTasks();
+        saveTeleportTasks();
+    }
+
+    /**
+     * Saves all {@link Task} to the Database
+     */
+    private static void saveGeneralTasks() {
+        String query = "INSERT INTO tasks VALUES(?,?,?,?)";
         try (Connection connection = storage.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             for (Task task : createdTasks.values()) {
@@ -98,10 +118,51 @@ public class MemoryUtil {
                 preparedStatement.setInt(2, task.getAreaID());
                 preparedStatement.setString(3, task.getTaskType());
                 preparedStatement.setInt(4, task.getPriority());
+                preparedStatement.executeUpdate();
             }
             PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all Tasks");
         } catch (SQLException e) {
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save tasks", e.getMessage());
+        } finally {
+            storage.disconnect();
+        }
+    }
+
+    /**
+     * Saves all {@link CommandTask} to the Database
+     */
+    private static void saveCommandTasks() {
+        String query = "INSERT INTO command_tasks VALUES(?,?)";
+        try (Connection connection = storage.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            for (CommandTask task : createdCommandTasks.values()) {
+                preparedStatement.setInt(1, task.getTaskID());
+                preparedStatement.setString(2, task.getRequiredCommand());
+                preparedStatement.executeUpdate();
+            }
+            PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all command tasks");
+        } catch (SQLException e) {
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save tasks", e.getMessage());
+        } finally {
+            storage.disconnect();
+        }
+    }
+
+    /**
+     * Saves all {@link TeleportTask} to the Database
+     */
+    private static void saveTeleportTasks() {
+        String query = "INSERT INTO teleport_tasks VALUES(?,?,?)";
+        try (Connection connection = storage.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            for (TeleportTask teleportTask : createdTeleportTasks.values()) {
+                preparedStatement.setInt(1, teleportTask.getTaskID());
+                preparedStatement.setString(2, GeneralMethods.locationToString(teleportTask.getFrom()));
+                preparedStatement.setString(3, GeneralMethods.locationToString(teleportTask.getTo()));
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save teleport tasks", e.getMessage());
         } finally {
             storage.disconnect();
         }
@@ -158,88 +219,6 @@ public class MemoryUtil {
     }
 
     /**
-     * Loads all {@link Structure} from the Database into
-     * the {@link #createdStructures createdStructures} map
-     */
-    public static void loadStructures() {
-        long loadingStartTime = System.currentTimeMillis();
-        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Loading &5Structures..."));
-        storage.connect();
-        String query = "SELECT * FROM structures";
-        try (Connection connection = storage.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                int structureID = resultSet.getInt("structureID");
-                int areaID = resultSet.getInt("areaID");
-                String schematic = resultSet.getString("schematic");
-                createdStructures.put(structureID, new Structure(
-                        structureID,
-                        areaID,
-                        new File(schematic)));
-            }
-            PlayerTutorials.getInstance().getLogger().log(Level.FINE, ChatUtil.format("&7Successfully loaded all &5Structures&7! \n" +
-                    "&5Structures &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
-        } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load all structures! " + e.getMessage());
-        } finally {
-            storage.disconnect();
-        }
-    }
-
-    /**
-     * Loads all {@link Task} from the Database into
-     * the {@link #createdTasks createdTasks} map
-     */
-    public static void loadTasks() { // TODO: Not so correctly made yet. Gotta use joins and redo some db structure
-        long loadingStartTime = System.currentTimeMillis();
-        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Loading &dTasks..."));
-        storage.connect();
-        String query = "SELECT * FROM tasks";
-        try (Connection connection = storage.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                int taskID = resultSet.getInt("taskID");
-                int areaID = resultSet.getInt("areaID");
-                String taskType = resultSet.getString("type");
-                switch (taskType) {
-                    case "CommandTask":
-                        String commandTaskQuery = "SELECT * FROM command_tasks";
-                        PreparedStatement commandPreparedStatement = connection.prepareStatement(commandTaskQuery);
-                        ResultSet commandResult = commandPreparedStatement.executeQuery();
-                        int commandPriority = commandResult.getInt("priority");
-                        String requiredCommand = commandResult.getString("requiredCommand");
-                        createdTasks.put(taskID, new CommandTask(
-                                taskID,
-                                areaID,
-                                commandPriority,
-                                requiredCommand));
-                    case "TeleportTask":
-                        String teleportTaskQuery = "SELECT * FROM teleport_tasks";
-                        PreparedStatement teleportPreparedStatement = connection.prepareStatement(teleportTaskQuery);
-                        ResultSet teleportResult = teleportPreparedStatement.executeQuery();
-                        int teleportPriority = teleportResult.getInt("priority");
-                        String fromTeleport = teleportResult.getString("from");
-                        String toTeleport = teleportResult.getString("to");
-                        createdTasks.put(taskID, new TeleportTask(
-                                taskID,
-                                areaID,
-                                teleportPriority,
-                                GeneralMethods.stringToLocation(fromTeleport),
-                                GeneralMethods.stringToLocation(toTeleport)));
-                }
-            }
-            PlayerTutorials.getInstance().getLogger().log(Level.FINE, ChatUtil.format("&7Successfully loaded all &dTasks&7! \n" +
-                    "&dStructures &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
-        } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load tasks! " + e.getMessage());
-        } finally {
-            storage.disconnect();
-        }
-    }
-
-    /**
      * Loads all {@link Area} from the Database into
      * the {@link #createdAreas createdAreas} map
      */
@@ -276,8 +255,8 @@ public class MemoryUtil {
 
                     createdAreas.put(areaID, noTasksArea);
                 } else { // If there are tasks
-                    Map<Integer, Task> tasks = new ConcurrentHashMap<>();
-                    tasks.put(task.getPriority(), task);
+                    List<Task> tasks = new ArrayList<>();
+                    tasks.add(task);
 
                     Area area = new Area(
                             areaID,
@@ -295,6 +274,129 @@ public class MemoryUtil {
                     "&8Areas &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
         } catch (SQLException e) {
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load all areas! " + e.getMessage());
+        } finally {
+            storage.disconnect();
+        }
+    }
+
+    /**
+     * Loads all forms of {@link Task} via
+     * the sub methods {@link #loadCommandTask(int, int, int, Connection) loadCommandTask}
+     * and {@link #loadTeleportTask(int, int, int, Connection) loadTeleportTask}
+     */
+    public static void loadTasks() {
+        long loadingStartTime = System.currentTimeMillis();
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Loading &dTasks..."));
+        storage.connect();
+        String query = "SELECT * FROM tasks";
+        try (Connection connection = storage.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int taskID = resultSet.getInt("taskID");
+                int areaID = resultSet.getInt("areaID");
+                String taskType = resultSet.getString("type");
+                int priority = resultSet.getInt("priority");
+                switch (taskType) {
+                    case "CommandTask":
+                        loadCommandTask(taskID, areaID, priority, connection);
+                        break;
+                    case "TeleportTask":
+                        loadTeleportTask(taskID, areaID, priority, connection);
+                    default:
+                        PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Uknown task type! " + taskType);
+                        break;
+                }
+            }
+            PlayerTutorials.getInstance().getLogger().log(Level.FINE, ChatUtil.format("&7Successfully loaded all &dTasks&7! \n" +
+                    "&dStructures &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
+        } catch (SQLException e) {
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load tasks! " + e.getMessage());
+        } finally {
+            storage.disconnect();
+        }
+    }
+
+    /**
+     * Loads the {@link CommandTask} into the
+     * {@link #createdCommandTasks createdCommandTasks} and
+     * {@link #createdTasks createdTasks} {@link Map}
+     *
+     * @param taskID TaskID
+     * @param areaID AreaID
+     * @param priority Priority of the {@link Task}
+     * @param connection Connection
+     * @throws SQLException
+     */
+    private static void loadCommandTask(int taskID, int areaID, int priority, Connection connection) throws SQLException {
+        String query = "SELECT * FROM command_tasks WHERE taskID = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1, taskID);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            String requiredCommand = resultSet.getString("required_command");
+            CommandTask commandTask = new CommandTask(taskID, areaID, priority, requiredCommand);
+            createdTasks.put(taskID, commandTask);
+            createdCommandTasks.put(taskID, commandTask);
+        }
+    }
+
+    /**
+     * Loads the {@link TeleportTask} into the
+     * {@link #createdTeleportTasks createdTeleportTasks} and
+     * {@link #createdTasks createdTasks} {@link Map}
+     *
+     * @param taskID TaskID
+     * @param areaID AreaID
+     * @param priority Priority of the {@link Task}
+     * @param connection Connection
+     * @throws SQLException
+     */
+    private static void loadTeleportTask(int taskID, int areaID, int priority, Connection connection) throws SQLException {
+        String query = "SELECT * FROM teleport_tasks WHERE taskID = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1, taskID);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            String teleportFrom = resultSet.getString("fromLocation");
+            String teleportTo = resultSet.getString("toLocation");
+            TeleportTask teleportTask = new TeleportTask(
+                    taskID,
+                    areaID,
+                    priority,
+                    GeneralMethods.stringToLocation(teleportFrom),
+                    GeneralMethods.stringToLocation(teleportTo)
+            );
+            createdTasks.put(taskID, teleportTask);
+            createdTeleportTasks.put(taskID, teleportTask);
+        }
+    }
+
+    /**
+     * Loads all {@link Structure} from the Database into
+     * the {@link #createdStructures createdStructures} map
+     */
+    public static void loadStructures() {
+        long loadingStartTime = System.currentTimeMillis();
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Loading &5Structures..."));
+        storage.connect();
+        String query = "SELECT * FROM structures";
+        try (Connection connection = storage.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int structureID = resultSet.getInt("structureID");
+                int areaID = resultSet.getInt("areaID");
+                String schematic = resultSet.getString("schematic");
+                createdStructures.put(structureID, new Structure(
+                        structureID,
+                        areaID,
+                        new File(schematic)));
+            }
+            PlayerTutorials.getInstance().getLogger().log(Level.FINE, ChatUtil.format("&7Successfully loaded all &5Structures&7! \n" +
+                    "&5Structures &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
+        } catch (SQLException e) {
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load all structures! " + e.getMessage());
         } finally {
             storage.disconnect();
         }

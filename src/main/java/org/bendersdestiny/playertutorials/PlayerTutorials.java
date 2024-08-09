@@ -2,6 +2,7 @@ package org.bendersdestiny.playertutorials;
 
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.configuration.ConfigManager;
+import org.bendersdestiny.playertutorials.manager.StorageManager;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
 import org.bukkit.event.Listener;
@@ -33,11 +34,20 @@ public final class PlayerTutorials extends JavaPlugin {
 		if (chatUtil != null) {
 			chatUtil.sendServerStopMessage();
 		}
+
+		saveEverything();
 	}
 
 	void registerListeners(Listener... listeners) {
 		for (Listener listener : listeners) {
 			getServer().getPluginManager().registerEvents(listener, this);
 		}
+	}
+
+	void saveEverything() {
+		StorageManager.saveAllTutorialsAsync();
+		StorageManager.saveAllAreasAsync();
+		StorageManager.saveAllTasksAsync();
+		StorageManager.saveAllStructuresAsync();
 	}
 }

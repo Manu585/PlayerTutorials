@@ -2,15 +2,15 @@ package org.bendersdestiny.playertutorials.manager;
 
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
-import org.bendersdestiny.playertutorials.tutorial.area.structure.Structure;
+import org.bendersdestiny.playertutorials.tutorial.area.Area;
+import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPlayer;
 import org.bukkit.entity.Player;
-
-import java.io.File;
 
 @Getter
 public class TutorialManager {
 	private final Tutorial tutorial;
+	private final Area area;
 	private final Player player;
 
 	/**
@@ -20,8 +20,9 @@ public class TutorialManager {
 	 *
 	 * @param tutorial The tutorial to manage
 	 */
-	public TutorialManager(Tutorial tutorial, final Player player) {
+	public TutorialManager(final Tutorial tutorial, final Area area, final Player player) {
 		this.tutorial = tutorial;
+		this.area = area;
 		this.player = player;
 	}
 
@@ -30,7 +31,7 @@ public class TutorialManager {
 	 */
 	public void start() {
 		if (tutorial != null) {
-			StructureManager.loadStructure(new Structure(1, new File("BlaBla/schematic.schem"))); // TODO: Make IDs generate randomly
+			StructureManager.loadStructure(MemoryUtil.createdStructures.get(area.getAreaID()));
 			TutorialPlayer.getPlayer(player.getUniqueId());
 		}
 	}
