@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 @Getter
@@ -17,6 +18,8 @@ public class Storage {
 	private String storageType;
 	private SQLiteStorage sqliteStorage;
 	private MySQLStorage mySQLStorage;
+
+	private AtomicBoolean connected = new AtomicBoolean(false); //TODO: Not right approach, just temporary to keep the idea in mind
 
 	/**
 	 * The {@link Storage} object represents the storage in the PlayerTutorials plugin.
@@ -29,8 +32,10 @@ public class Storage {
 
 		if (storageType.equalsIgnoreCase("sqlite")) {
 			this.setupSQLiteStorage();
+			connected = sqliteStorage.getConnected();
 		} else if (storageType.equalsIgnoreCase("mysql")) {
 			this.setupMySQLStorage();
+			connected = mySQLStorage.getConnected();
 		} else { // Wrong config input case!
 			PlayerTutorials.getInstance().getLogger().log(
 					Level.WARNING,
@@ -38,6 +43,7 @@ public class Storage {
 					"Viable options: 'mysql' or 'sqlite'! Defaulting to 'sqlite'.");
 			this.storageType = "sqlite";
 			this.setupSQLiteStorage();
+			connected = sqliteStorage.getConnected();
 		}
 		this.createAllTables();
 	}

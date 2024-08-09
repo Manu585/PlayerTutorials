@@ -1,8 +1,11 @@
 package org.bendersdestiny.playertutorials.manager;
 
 import org.bendersdestiny.playertutorials.PlayerTutorials;
+import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.logging.Level;
 
 public class StorageManager {
     /**
@@ -12,7 +15,11 @@ public class StorageManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                MemoryUtil.saveTutorials();
+                try {
+                    MemoryUtil.saveTutorials();
+                } catch (Exception e) {
+                    PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("&4Couldn't save Tutorials!"));
+                }
             }
         }.runTaskAsynchronously(PlayerTutorials.getInstance());
     }
@@ -24,7 +31,11 @@ public class StorageManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                MemoryUtil.saveAreas();
+                try {
+                    MemoryUtil.saveAreas();
+                } catch (Exception e) {
+                    PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("&4Couldn't save Areas!"));
+                }
             }
         }.runTaskAsynchronously(PlayerTutorials.getInstance());
     }
@@ -36,7 +47,11 @@ public class StorageManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                MemoryUtil.saveTasks();
+                try {
+                    MemoryUtil.saveTasks();
+                } catch (Exception e) {
+                    PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("&4Couldn't save Tasks!"));
+                }
             }
         }.runTaskAsynchronously(PlayerTutorials.getInstance());
     }
@@ -48,7 +63,11 @@ public class StorageManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                MemoryUtil.saveStructures();
+                try {
+                    MemoryUtil.saveStructures();
+                } catch (Exception e) {
+                    PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("&4Couldn't save Structures!"));
+                }
             }
         }.runTaskAsynchronously(PlayerTutorials.getInstance());
     }
@@ -60,7 +79,11 @@ public class StorageManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                MemoryUtil.loadTutorials();
+                try {
+                    MemoryUtil.loadTutorials();
+                } catch (Exception e) {
+                    PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("&4Couldn't load Tutorials!"));
+                }
             }
         }.runTaskAsynchronously(PlayerTutorials.getInstance());
     }
@@ -72,7 +95,11 @@ public class StorageManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                MemoryUtil.loadAreas();
+                try {
+                    MemoryUtil.loadAreas();
+                } catch (Exception e) {
+                    PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("&4Couldn't load Areas!"));
+                }
             }
         }.runTaskAsynchronously(PlayerTutorials.getInstance());
     }
@@ -84,7 +111,11 @@ public class StorageManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                MemoryUtil.loadTasks();
+                try {
+                    MemoryUtil.loadTasks();
+                } catch (Exception e) {
+                    PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("&4Couldn't load Tasks!"));
+                }
             }
         }.runTaskAsynchronously(PlayerTutorials.getInstance());
     }
@@ -96,7 +127,11 @@ public class StorageManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                MemoryUtil.loadStructures();
+                try {
+                    MemoryUtil.loadStructures();
+                } catch (Exception e) {
+                    PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("&4Couldn't load Structures!"));
+                }
             }
         }.runTaskAsynchronously(PlayerTutorials.getInstance());
     }

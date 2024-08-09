@@ -31,7 +31,6 @@ import java.util.logging.Level;
  * Helps with loading and saving all {@link Tutorial}, {@link Area},
  * {@link Task} and {@link Structure}!
  */
-@SuppressWarnings("all") // TODO: Remove suppression. Only here because no DB schematic at work.
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemoryUtil {
     private static final Storage storage = PlayerTutorials.getInstance().getStorage();
@@ -78,7 +77,7 @@ public class MemoryUtil {
     public static void saveAreas() {
         long startTime = System.currentTimeMillis();
         PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Saving " + Area.areaColor + "Areas &7..."));
-        String query = "INSERT INTO areas VALUES(?,?,?,?,?,?)";
+        String query = "INSERT INTO areas VALUES(?,?,?,?,?,?,?)";
         try (Connection connection = storage.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             for (Area area : createdAreas.values()) {
@@ -87,7 +86,8 @@ public class MemoryUtil {
                 preparedStatement.setInt(3, area.getStructure().getStructureID());
                 preparedStatement.setString(4, area.getName());
                 preparedStatement.setString(5, GeneralMethods.locationToString(area.getSpawnPoint()));
-                preparedStatement.setInt(6, area.getPriority());
+                preparedStatement.setInt(6, area.getTasks().getFirst().getTaskID()); // TODO: Wrong way of doing this
+                preparedStatement.setInt(7, area.getPriority());
             }
             PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all " + Area.areaColor + "Areas &7in &a" +
                     ((System.currentTimeMillis() - startTime) / 1000) + " &7seconds");
@@ -99,7 +99,7 @@ public class MemoryUtil {
     }
 
     /**
-     * Main task saving method with the sub task saving methods
+     * Main task saving method with the sub-task saving methods
      * like {@link #saveGeneralTasks()}, {@link #saveCommandTasks()}
      * or {@link #saveTeleportTasks()}
      */
@@ -332,7 +332,7 @@ public class MemoryUtil {
      * @param areaID AreaID
      * @param priority Priority of the {@link Task}
      * @param connection Connection
-     * @throws SQLException
+     * @throws SQLException If there are any complications
      */
     private static void loadCommandTask(int taskID, int areaID, int priority, Connection connection) throws SQLException {
         String query = "SELECT * FROM command_tasks WHERE taskID = ?";
@@ -356,7 +356,7 @@ public class MemoryUtil {
      * @param areaID AreaID
      * @param priority Priority of the {@link Task}
      * @param connection Connection
-     * @throws SQLException
+     * @throws SQLException If there are any complications
      */
     private static void loadTeleportTask(int taskID, int areaID, int priority, Connection connection) throws SQLException {
         String query = "SELECT * FROM teleport_tasks WHERE taskID = ?";
