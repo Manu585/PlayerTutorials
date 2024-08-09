@@ -38,7 +38,6 @@ public class Config {
 				plugin.getLogger().log(Level.SEVERE, "Failed to create config file: " + fileName, e);
 			}
 		}
-
 		config = new YamlConfiguration();
 		try {
 			config.load(configFile);

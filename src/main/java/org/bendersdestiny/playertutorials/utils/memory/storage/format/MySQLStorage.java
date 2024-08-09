@@ -36,6 +36,17 @@ public class MySQLStorage {
 		this.database = database;
 	}
 
+	/**
+	 * Instance of the {@link MySQLStorage}
+	 *
+	 * @param username Database Username
+	 * @param password Database Password
+	 * @param port Database Port
+	 * @param host Database host
+	 * @param database Database name
+	 *
+	 * @return the instance
+	 */
 	public static MySQLStorage getInstance(String username, String password, String port, String host, String database) {
 		if (instance == null) {
 			instance = new MySQLStorage(username, password, port, host, database);
@@ -43,6 +54,9 @@ public class MySQLStorage {
 		return instance;
 	}
 
+	/**
+	 * The MySQL way of connecting to the Database
+	 */
 	public void connect() {
 		try {
 			String connectionString = "jdbc:mysql://" + host + ":" + port + "/" + database;
@@ -53,6 +67,9 @@ public class MySQLStorage {
 		}
 	}
 
+	/**
+	 * The MySQL way of disconnecting from the Database
+	 */
 	public void disconnect() {
 		if (connection != null) {
 			try {

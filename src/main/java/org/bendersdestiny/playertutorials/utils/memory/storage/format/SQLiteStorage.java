@@ -24,6 +24,13 @@ public class SQLiteStorage {
 		this.file = file;
 	}
 
+	/**
+	 * Instance of the {@link SQLiteStorage}
+	 *
+	 * @param file .db {@link File}
+	 *
+	 * @return the instance
+	 */
 	public static SQLiteStorage getInstance(File file) {
 		if (instance == null) {
 			instance = new SQLiteStorage(file);
@@ -31,6 +38,9 @@ public class SQLiteStorage {
 		return instance;
 	}
 
+	/**
+	 * The SQLite way of connecting to the database
+	 */
 	public void connect() {
 		try {
 			String connectionString = "jdbc:sqlite:" + file.getAbsolutePath();
@@ -41,6 +51,9 @@ public class SQLiteStorage {
 		}
 	}
 
+	/**
+	 * The SQLite way of disconnecting from the database
+	 */
 	public void disconnect() {
 		try {
 			if (connection != null && !connection.isClosed()) {

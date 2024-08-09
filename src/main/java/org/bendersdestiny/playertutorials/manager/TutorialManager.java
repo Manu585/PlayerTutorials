@@ -3,7 +3,6 @@ package org.bendersdestiny.playertutorials.manager;
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
 import org.bendersdestiny.playertutorials.tutorial.area.Area;
-import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPlayer;
 import org.bukkit.entity.Player;
 

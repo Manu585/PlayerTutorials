@@ -2,9 +2,7 @@ package org.bendersdestiny.playertutorials.utils.memory.storage;
 
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
-import org.bendersdestiny.playertutorials.tutorial.area.Area;
 import org.bendersdestiny.playertutorials.configuration.ConfigManager;
-import org.bendersdestiny.playertutorials.methods.GeneralMethods;
 import org.bendersdestiny.playertutorials.utils.memory.storage.format.MySQLStorage;
 import org.bendersdestiny.playertutorials.utils.memory.storage.format.SQLiteStorage;
 
@@ -24,7 +22,6 @@ public class Storage {
 	 * The {@link Storage} object represents the storage in the PlayerTutorials plugin.
 	 * It manages the Storage type, tables and connections.
 	 */
-	@SuppressWarnings("all") // For the 'else if' part.
 	public Storage() {
 		this.storageType = Objects.requireNonNull(ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.type")).equalsIgnoreCase("mysql")
 				? "mysql"
@@ -180,7 +177,7 @@ public class Storage {
 						"structureID INTEGER PRIMARY KEY," +
 						"areaID INTEGER," +
 						"schematic TEXT," +
-						"FOREIGN KEY(areaID) REFERENCES areas(areaID" +
+						"FOREIGN KEY(areaID) REFERENCES areas(areaID)" +
 						")";
 		try (Connection connection = this.getConnection();
 			 Statement statement = connection.createStatement()) {
@@ -199,7 +196,7 @@ public class Storage {
 				"CREATE TABLE IF NOT EXISTS tasks (" +
 						"taskID INTEGER PRIMARY KEY," +
 						"areaID INTEGER NOT NULL," +
-						"type VARCHAR(50 NOT NULL)," + // 'CommandTask' or 'TeleportTask' or ...
+						"type VARCHAR(50)," + // 'CommandTask' or 'TeleportTask' or ...
 						"priority INTEGER NOT NULL," +
 						"FOREIGN KEY(areaID) REFERENCES areas(areaID)" +
 						")";
@@ -254,19 +251,5 @@ public class Storage {
 		} finally {
 			this.disconnect();
 		}
-	}
-
-	/**
-	 * Test class to test at home
-	 */
-	static class StorageSaver {
-
-	}
-
-	/**
-	 * Test class to test at home
-	 */
-	static class StorageLoader {
-
 	}
 }
