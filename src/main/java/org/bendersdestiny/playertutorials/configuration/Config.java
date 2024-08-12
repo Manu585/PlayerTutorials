@@ -44,7 +44,6 @@ public class Config {
 		} catch (IOException | InvalidConfigurationException e) {
 			plugin.getLogger().log(Level.SEVERE, "Failed to load config file: " + fileName, e);
 		}
-
 		this.reload();
 	}
 

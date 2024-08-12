@@ -2,6 +2,7 @@ package org.bendersdestiny.playertutorials.tutorial.area.structure;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Location;
 
 import java.io.File;
 
@@ -31,5 +32,13 @@ public class Structure {
         this.structureID = structureID;
         this.areaID = areaID;
         this.structureSchematic = structureSchematic;
+    }
+
+    public void spawn(Location center) {
+
+    }
+
+    public void destroy(Location center) {
+
     }
 }

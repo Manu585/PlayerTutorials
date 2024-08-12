@@ -37,7 +37,7 @@ public abstract class BaseItem {
 			meta.setLore(this.lore);
 			this.item.setItemMeta(meta);
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"NULL Itemmeta!");
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"NULL ItemMeta!");
 			throw new NullPointerException();
 		}
 	}
