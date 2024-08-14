@@ -261,16 +261,13 @@ public class MemoryUtil {
 
                     createdAreas.put(areaID, noTasksArea);
                 } else { // If there are tasks
-                    List<Task> tasks = new ArrayList<>();
-                    tasks.add(task);
-
                     Area area = new Area(
                             areaID,
                             tutorialID,
                             createdStructures.get(structureID),
                             areaName,
                             GeneralMethods.stringToLocation(areaSpawn),
-                            tasks,
+                            new ArrayList<>(createdTasks.values()),
                             priority);
 
                     createdAreas.put(areaID, area);
