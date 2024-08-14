@@ -1,11 +1,14 @@
 package org.bendersdestiny.playertutorials.methods;
 
 import org.bendersdestiny.playertutorials.PlayerTutorials;
+import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
+import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +19,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
+/**
+ * Utility class for general purposes and some more
+ * advanced stuff. Mainly here for clean code
+ */
 public class GeneralMethods {
 
 	/**
@@ -34,7 +41,7 @@ public class GeneralMethods {
 
 			return world + "," + x + "," + y + "," + z;
 		} else {
-			return "ERROR";
+			throw new NullPointerException("locationToTransform is null");
 		}
 	}
 
@@ -94,6 +101,9 @@ public class GeneralMethods {
 	 * @return The ID for the tutorials table
 	 */
 	public static int createTutorialsID(Storage storage) { //TODO: Not finished yet, just a WIP version
+		if (storage == null) {
+			throw new NullPointerException("Storage has not been initiated yet!");
+		}
 		storage.connect();
 		String query = "SELECT id FROM tutorials";
 		try (Connection connection = storage.getConnection();
@@ -111,5 +121,30 @@ public class GeneralMethods {
 			storage.disconnect();
 		}
 		throw new NullPointerException("Failed to create tutorials ID");
+	}
+
+	/**
+	 * Join the {@link org.bendersdestiny.playertutorials.tutorial.area.Area} Selection mode so players can
+	 * create the area they'd like to store in a
+	 * {@link org.bendersdestiny.playertutorials.tutorial.Tutorial}
+	 *
+	 * @param tutorialPlayer The {@link Player} who should enter the Selection mode
+	 */
+	public static void joinAreaSelectionMode(TutorialPlayer tutorialPlayer) {
+		if (tutorialPlayer != null) {
+			Player player = tutorialPlayer.getPlayer();
+			if (player != null) {
+				// SAVE ORIGINAL ITEMS
+				for (int i = 0; i < player.getInventory().getContents().length; i++) {
+					tutorialPlayer.getORIGINAL_ITEMS().put(i, player.getInventory().getContents()[i]);
+				}
+				player.getInventory().clear();
+				// player.getInventory().setItem(4, ItemManager.AreaSelector);
+				player.sendTitle(
+						ChatUtil.format("&7Select the area with the &6Axe"),
+						ChatUtil.format("&7Left click: &6Pos1&7, Right click: &6Pos2"),
+						10, 60, 10);
+			}
+		}
 	}
 }

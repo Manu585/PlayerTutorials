@@ -1,13 +1,12 @@
 package org.bendersdestiny.playertutorials.items;
 
 import lombok.Getter;
-import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 @Getter
 public abstract class BaseItem {
@@ -16,14 +15,17 @@ public abstract class BaseItem {
 	public final Material material;
 	public final ItemStack item;
 
+	public static List<BaseItem> allItems = new ArrayList<>();
+
 	public BaseItem(String name, List<String> lore, Material material) {
 		this.name = name;
 		this.lore = lore;
 		this.material = material;
-
 		this.item = new ItemStack(material);
 
 		this.createItem();
+
+		allItems.add(this);
 	}
 
 	/**
@@ -37,8 +39,7 @@ public abstract class BaseItem {
 			meta.setLore(this.lore);
 			this.item.setItemMeta(meta);
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"NULL ItemMeta!");
-			throw new NullPointerException();
+			throw new NullPointerException("ItemMeta cannot be null");
 		}
 	}
 }

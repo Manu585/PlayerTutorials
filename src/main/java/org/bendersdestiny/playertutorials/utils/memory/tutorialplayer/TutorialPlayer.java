@@ -3,6 +3,7 @@ package org.bendersdestiny.playertutorials.utils.memory.tutorialplayer;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 import java.util.UUID;
@@ -11,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class TutorialPlayer {
 	public static Map<UUID, TutorialPlayer> PLAYERS = new ConcurrentHashMap<>();
+	public Map<Integer, ItemStack> ORIGINAL_ITEMS = new ConcurrentHashMap<>();
 
 	private final UUID uuid;
 	private final Player player;

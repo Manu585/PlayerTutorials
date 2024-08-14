@@ -17,7 +17,7 @@ public class SQLiteStorage {
 	private final File file;
 	private Connection connection;
 
-	private AtomicBoolean connected = new AtomicBoolean(false);
+	private final AtomicBoolean connected = new AtomicBoolean(false);
 
 	/**
 	 * The SQLite Storage type

@@ -11,10 +11,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class PlayerTutorials extends JavaPlugin {
 	@Getter
 	private static PlayerTutorials instance;
-	private ChatUtil chatUtil;
 	@Getter
 	private Storage storage;
+	private ChatUtil chatUtil;
 
+	/**
+	 * Runs once the server starts
+	 */
 	@Override
 	public void onEnable() {
 		instance = this;
@@ -29,15 +32,19 @@ public final class PlayerTutorials extends JavaPlugin {
 		chatUtil.sendServerStartupMessage();
 	}
 
+	/**
+	 * Runs once the server closes
+	 */
 	@Override
-	public void onDisable() {
+    public void onDisable() {
+		this.saveEverythingAsync();
+
 		if (storage != null) {
 			storage.disconnect();
 		}
 		if (chatUtil != null) {
 			chatUtil.sendServerStopMessage();
 		}
-		this.saveEverythingAsync();
 	}
 
 	/**
