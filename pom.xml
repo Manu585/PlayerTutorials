@@ -46,6 +46,11 @@
 			<version>1.18.32</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.github.stefvanschie.inventoryframework</groupId>
+			<artifactId>IF</artifactId>
+			<version>0.10.17</version>
+		</dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
@@ -75,6 +80,15 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>3.5.2</version>
+				<configuration>
+					<dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
+					<relocations>
+						<relocation>
+							<pattern>com.github.stefvanschie.inventoryframework</pattern>
+							<shadedPattern>org.bendersdestiny.inventoryframework</shadedPattern>
+						</relocation>
+					</relocations>
+				</configuration>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -83,9 +97,6 @@
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<createDependencyReducedPom>false</createDependencyReducedPom>
-				</configuration>
 			</plugin>
 		</plugins>
 		

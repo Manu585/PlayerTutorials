@@ -1,50 +1,45 @@
 package org.bendersdestiny.playertutorials.gui.tutorial;
 
+import com.github.stefvanschie.inventoryframework.gui.GuiItem;
+import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
+import com.github.stefvanschie.inventoryframework.pane.Pane;
+import com.github.stefvanschie.inventoryframework.pane.StaticPane;
+import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.Bukkit;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
+import org.bendersdestiny.playertutorials.PlayerTutorials;
+import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
-import java.util.Map;
+@Getter
+public class TutorialsGUI {
+    private final ChestGui gui;
+    private final StaticPane pane;
+    private final Player player;
 
-@Setter
-public class TutorialsGUI implements InventoryHolder {
-    private Inventory inventory;
-    @Getter
-    private String inventoryTitle;
-    @Getter
-    private InventoryHolder holder;
-    @Getter
-    private int rows;
-    @Getter
-    private Map<Integer, ItemStack> items = new HashMap<>();
+    private int maxTutorials;
 
-    public TutorialsGUI(String inventoryTitle, int rows, InventoryHolder holder) {
-        this.inventoryTitle = inventoryTitle;
-        this.rows = rows;
-        this.holder = holder;
+    public TutorialsGUI(int rows, String title, Player player) {
+        this.gui = new ChestGui(rows, title, PlayerTutorials.getInstance());
+        this.pane = new StaticPane(0, 0, 9, 4, Pane.Priority.HIGH);
+        this.player = player;
 
-        this.createInventory();
+        this.setupUI();
     }
 
-    /**
-     * Creates the {@link Inventory}
-     */
-    private void createInventory() {
-        inventory = Bukkit.createInventory(holder, rows * 9, inventoryTitle);
+    private void setupUI() {
+        this.gui.addPane(this.pane);
+        this.pane.setVisible(true);
 
-        for (int i : items.keySet()) {
-            inventory.setItem(i, items.get(i));
-        }
-    }
+        ItemStack filler = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+        ItemMeta fillerMeta = filler.getItemMeta();
+		assert fillerMeta != null;
+		fillerMeta.setDisplayName(ChatUtil.format("&7"));
+        filler.setItemMeta(fillerMeta);
 
-    @NotNull
-    @Override
-    public Inventory getInventory() {
-        return this.inventory;
+        this.pane.fillWith(filler);
+        this.pane.addItem(new GuiItem(new ItemStack(Material.GREEN_CONCRETE)), Slot.fromIndex(31));
     }
 }

@@ -1,12 +1,15 @@
 package org.bendersdestiny.playertutorials;
 
 import lombok.Getter;
+import org.bendersdestiny.playertutorials.commands.TutorialCommand;
 import org.bendersdestiny.playertutorials.configuration.ConfigManager;
 import org.bendersdestiny.playertutorials.manager.StorageManager;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Objects;
 
 public final class PlayerTutorials extends JavaPlugin {
 	@Getter
@@ -28,6 +31,9 @@ public final class PlayerTutorials extends JavaPlugin {
 		storage = new Storage(); // ConfigManager has to be initialized first
 
 		this.loadEverythingAsync();
+
+		Objects.requireNonNull(getCommand("tutorial")).setExecutor(new TutorialCommand());
+		Objects.requireNonNull(getCommand("tutorial")).setTabCompleter(new TutorialCommand());
 
 		chatUtil.sendServerStartupMessage();
 	}
