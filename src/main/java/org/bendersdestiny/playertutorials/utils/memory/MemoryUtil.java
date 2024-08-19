@@ -21,7 +21,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -65,9 +64,8 @@ public class MemoryUtil {
             PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Successfully saved all "  + Tutorial.tutorialColor + "&6Tutorials &7in &a" +
                     ((System.currentTimeMillis() - startTime) / 1000) + " &7seconds"));
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("Couldn't save " + Tutorial.tutorialColor + "tutorials"), e.getMessage());
-        } finally {
             storage.disconnect();
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("Couldn't save " + Tutorial.tutorialColor + "tutorials"), e.getMessage());
         }
     }
 
@@ -92,9 +90,8 @@ public class MemoryUtil {
             PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all " + Area.areaColor + "Areas &7in &a" +
                     ((System.currentTimeMillis() - startTime) / 1000) + " &7seconds");
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save areas", e.getMessage());
-        } finally {
             storage.disconnect();
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save areas", e.getMessage());
         }
     }
 
@@ -128,9 +125,8 @@ public class MemoryUtil {
             PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("Successfully saved all " + Task.taskColor + "Tasks &7in &a" +
                     (System.currentTimeMillis() - startTime) / 1000 + " &7seconds"));
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save tasks", e.getMessage());
-        } finally {
             storage.disconnect();
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save tasks", e.getMessage());
         }
     }
 
@@ -148,9 +144,8 @@ public class MemoryUtil {
             }
             PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all command tasks");
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save tasks", e.getMessage());
-        } finally {
             storage.disconnect();
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save tasks", e.getMessage());
         }
     }
 
@@ -168,9 +163,8 @@ public class MemoryUtil {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save teleport tasks", e.getMessage());
-        } finally {
             storage.disconnect();
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save teleport tasks", e.getMessage());
         }
     }
 
@@ -188,9 +182,8 @@ public class MemoryUtil {
             }
             PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all Structures");
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save structure", e.getMessage());
-        } finally {
             storage.disconnect();
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save structure", e.getMessage());
         }
     }
 
@@ -218,9 +211,8 @@ public class MemoryUtil {
             PlayerTutorials.getInstance().getLogger().log(Level.FINE, ChatUtil.format("&7Successfully loaded all &6Tutorials&7! \n" +
                     "&6Tutorials &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load all tutorials! " + e.getMessage());
-        } finally {
             storage.disconnect();
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load all tutorials! " + e.getMessage());
         }
     }
 
@@ -276,9 +268,8 @@ public class MemoryUtil {
             PlayerTutorials.getInstance().getLogger().log(Level.FINE, ChatUtil.format("&7Successfully loaded all " + Area.areaColor + "Areas&7! \n" +
                     Area.areaColor + "Areas &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load all areas! " + e.getMessage());
-        } finally {
             storage.disconnect();
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load all areas! " + e.getMessage());
         }
     }
 
@@ -314,9 +305,8 @@ public class MemoryUtil {
             PlayerTutorials.getInstance().getLogger().log(Level.FINE, ChatUtil.format("&7Successfully loaded all " + Task.taskColor + "Tasks&7! \n" +
                     Task.taskColor + "Tasks &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load tasks! " + e.getMessage());
-        } finally {
             storage.disconnect();
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load tasks! " + e.getMessage());
         }
     }
 
@@ -399,9 +389,8 @@ public class MemoryUtil {
             PlayerTutorials.getInstance().getLogger().log(Level.FINE, ChatUtil.format("&7Successfully loaded all &5Structures&7! \n" +
                     "&5Structures &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load all structures! " + e.getMessage());
-        } finally {
             storage.disconnect();
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load all structures! " + e.getMessage());
         }
     }
 }

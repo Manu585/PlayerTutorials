@@ -1,7 +1,7 @@
 package org.bendersdestiny.playertutorials.commands;
 
 import lombok.Getter;
-import org.bendersdestiny.playertutorials.gui.tutorial.TutorialsGUI;
+import org.bendersdestiny.playertutorials.gui.MasterGUI;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -27,7 +27,7 @@ public class TutorialCommand implements CommandExecutor, TabCompleter {
                     if (args.length == 1) {
                         String arg = args[0];
                         if (arg.equalsIgnoreCase("create")) {
-                            new TutorialsGUI(4, "Tutorial", player).getGui().show(player);
+                            new MasterGUI(4, "Tutorial", player).getGui().show(player);
                             return true;
                         }
                     }

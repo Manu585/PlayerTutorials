@@ -19,7 +19,7 @@ public class Storage {
 	private SQLiteStorage sqliteStorage;
 	private MySQLStorage mySQLStorage;
 
-	private AtomicBoolean connected = new AtomicBoolean(false); //TODO: Not right approach, just temporary to keep the idea in mind
+	public static AtomicBoolean tableCreationComplete = new AtomicBoolean(false);
 
 	/**
 	 * The {@link Storage} object represents the storage in the PlayerTutorials plugin.
@@ -32,10 +32,8 @@ public class Storage {
 
 		if (storageType.equalsIgnoreCase("sqlite")) {
 			this.setupSQLiteStorage();
-			connected = sqliteStorage.getConnected();
 		} else if (storageType.equalsIgnoreCase("mysql")) {
 			this.setupMySQLStorage();
-			connected = mySQLStorage.getConnected();
 		} else { // Wrong config input case!
 			PlayerTutorials.getInstance().getLogger().log(
 					Level.WARNING,
@@ -43,7 +41,6 @@ public class Storage {
 					"Viable options: 'mysql' or 'sqlite'! Defaulting to 'sqlite'.");
 			this.storageType = "sqlite";
 			this.setupSQLiteStorage();
-			connected = sqliteStorage.getConnected();
 		}
 		this.createAllTables();
 	}
@@ -124,6 +121,8 @@ public class Storage {
 		this.createTasksTable();
 		this.createCommandTaskTable();
 		this.createTeleportTaskTable();
+
+		tableCreationComplete.set(true);
 	}
 
 	/**
@@ -141,9 +140,8 @@ public class Storage {
 			 Statement statement = connection.createStatement()) {
 			statement.execute(query);
 		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create tutorials table!", e);
-		} finally {
 			this.disconnect();
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create tutorials table!", e);
 		}
 	}
 
@@ -167,10 +165,9 @@ public class Storage {
              Statement statement = connection.createStatement()) {
             statement.execute(query);
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create areas table!", e);
-        } finally {
 			this.disconnect();
-		}
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create areas table!", e);
+        }
     }
 
 	/**
@@ -210,9 +207,8 @@ public class Storage {
 			 Statement statement = connection.createStatement()) {
 			statement.execute(query);
 		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create tasks table!", e);
-		} finally {
 			this.disconnect();
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create tasks table!", e);
 		}
 	}
 
@@ -232,9 +228,8 @@ public class Storage {
 			Statement statement = connection.createStatement()) {
 			statement.execute(query);
 		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create teleport tasks table!", e);
-		} finally {
 			this.disconnect();
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create teleport tasks table!", e);
 		}
 	}
 
@@ -253,9 +248,8 @@ public class Storage {
 			 Statement statement = connection.createStatement()) {
 			statement.execute(query);
 		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create command tasks table!", e);
-		} finally {
 			this.disconnect();
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create command tasks table!", e);
 		}
 	}
 }

@@ -3,13 +3,17 @@ package org.bendersdestiny.playertutorials;
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.commands.TutorialCommand;
 import org.bendersdestiny.playertutorials.configuration.ConfigManager;
+import org.bendersdestiny.playertutorials.listeners.TutorialListener;
 import org.bendersdestiny.playertutorials.manager.StorageManager;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Objects;
+import java.util.logging.Level;
 
 public final class PlayerTutorials extends JavaPlugin {
 	@Getter
@@ -26,14 +30,16 @@ public final class PlayerTutorials extends JavaPlugin {
 		instance = this;
 		chatUtil = new ChatUtil(this);
 
-		new ConfigManager(this);
+		this.registerCommands();
 
+		this.registerListeners(
+				new TutorialListener()
+		);
+
+		new ConfigManager(this);
 		storage = new Storage(); // ConfigManager has to be initialized first
 
 		this.loadEverythingAsync();
-
-		Objects.requireNonNull(getCommand("tutorial")).setExecutor(new TutorialCommand());
-		Objects.requireNonNull(getCommand("tutorial")).setTabCompleter(new TutorialCommand());
 
 		chatUtil.sendServerStartupMessage();
 	}
@@ -65,15 +71,32 @@ public final class PlayerTutorials extends JavaPlugin {
 	}
 
 	/**
+	 * Utility method to register all {@link org.bukkit.command.Command} with
+	 */
+	private void registerCommands() {
+		getCommand("tutorial").setExecutor(new TutorialCommand());
+		getCommand("tutorial").setTabCompleter(new TutorialCommand());
+	}
+
+	/**
 	 * Saves every {@link org.bendersdestiny.playertutorials.tutorial.Tutorial}, {@link org.bendersdestiny.playertutorials.tutorial.area.Area}
 	 * {@link org.bendersdestiny.playertutorials.tutorial.task.Task} and {@link org.bendersdestiny.playertutorials.tutorial.area.structure.Structure}
 	 * on an async thread. Uses methods from {@link StorageManager} to save.
 	 */
 	private void saveEverythingAsync() {
-		StorageManager.saveAllTutorialsAsync();
-		StorageManager.saveAllAreasAsync();
-		StorageManager.saveAllTasksAsync();
-		StorageManager.saveAllStructuresAsync();
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (Storage.tableCreationComplete.get()) {
+					StorageManager.saveAllTutorialsAsync();
+					StorageManager.saveAllAreasAsync();
+					StorageManager.saveAllTasksAsync();
+					StorageManager.saveAllStructuresAsync();
+				} else {
+					getLogger().log(Level.SEVERE, "Couldn't save any data! Async issue!");
+				}
+			}
+		}.runTaskAsynchronously(instance);
 	}
 
 	/**
@@ -82,9 +105,18 @@ public final class PlayerTutorials extends JavaPlugin {
 	 * on an async thread. Uses methods from {@link StorageManager} to load.
 	 */
 	private void loadEverythingAsync() {
-		StorageManager.loadAllTutorialsAsync();
-		StorageManager.loadAllAreasAsync();
-		StorageManager.loadAllTasksAsync();
-		StorageManager.loadAllStructuresAsync();
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (Storage.tableCreationComplete.get()) {
+					StorageManager.loadAllTutorialsAsync();
+					StorageManager.loadAllAreasAsync();
+					StorageManager.loadAllTasksAsync();
+					StorageManager.loadAllStructuresAsync();
+				} else {
+					getLogger().log(Level.SEVERE, "Couldn't save any data! Async issue!");
+				}
+			}
+		}.runTaskAsynchronously(instance);
 	}
 }
