@@ -298,7 +298,7 @@ public class MemoryUtil {
                     case "TeleportTask":
                         loadTeleportTask(taskID, areaID, priority, connection);
                     default:
-                        PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Uknown task type! " + taskType);
+                        PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Unknown task type! " + taskType);
                         break;
                 }
             }
