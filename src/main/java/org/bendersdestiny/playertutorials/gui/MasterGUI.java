@@ -67,7 +67,7 @@ public class MasterGUI {
             tutorialItemMeta.setCustomModelData(tutorial.getId());
             tutorialItemStack.setItemMeta(tutorialItemMeta);
 
-            tutorialItems.add(new GuiItem(tutorialItemStack));
+            this.tutorialItems.add(new GuiItem(tutorialItemStack));
         }
     }
 }
