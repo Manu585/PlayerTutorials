@@ -7,3 +7,9 @@ api-version: 1.20
 
 commands:
   tutorial:
+    description: Base command
+    permission: playertutorials.use
+    usage: /tutorial
+    permission-message: You are not permitted to use this command!
+    aliases:
+      - t

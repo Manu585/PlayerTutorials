@@ -43,8 +43,6 @@ public class TutorialCommand implements CommandExecutor, TabCompleter {
         ArrayList<String> arg = new ArrayList<>();
         if (args.length == 1) {
             arg.add("create");
-        } else {
-            arg.add("");
         }
         return arg;
     }

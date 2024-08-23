@@ -14,7 +14,11 @@ import java.util.stream.Collectors;
 public class ItemManager {
     private BaseItem areaSelector;
 
-    public void initiateBaseItems() {
+    public ItemManager() {
+        this.initiateBaseItems();
+    }
+
+    private void initiateBaseItems() {
         FileConfiguration config = ConfigManager.languageConfig.get();
         String path = "playertutorials.items.";
 

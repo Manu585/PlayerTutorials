@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 public class TutorialNamePrompt extends StringPrompt {
     @Override
     public @NotNull String getPromptText(@NotNull ConversationContext conversationContext) {
-        return ChatUtil.format("Type the name of the tutorial");
+        return ChatUtil.format("&7Type the name of the &6tutorial &7or type '&6cancel&7' to cancel");
     }
 
     @Override

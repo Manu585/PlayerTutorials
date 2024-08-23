@@ -4,15 +4,14 @@ import lombok.Getter;
 import org.bendersdestiny.playertutorials.commands.TutorialCommand;
 import org.bendersdestiny.playertutorials.configuration.ConfigManager;
 import org.bendersdestiny.playertutorials.listeners.TutorialListener;
+import org.bendersdestiny.playertutorials.manager.ItemManager;
 import org.bendersdestiny.playertutorials.manager.StorageManager;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
-import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Objects;
 import java.util.logging.Level;
 
 public final class PlayerTutorials extends JavaPlugin {
@@ -29,6 +28,8 @@ public final class PlayerTutorials extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		chatUtil = new ChatUtil(this);
+
+		new ItemManager();
 
 		this.registerCommands();
 
