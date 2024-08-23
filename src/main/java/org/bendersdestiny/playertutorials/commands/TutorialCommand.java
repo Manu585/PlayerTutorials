@@ -27,7 +27,7 @@ public class TutorialCommand implements CommandExecutor, TabCompleter {
                     if (args.length == 1) {
                         String arg = args[0];
                         if (arg.equalsIgnoreCase("create")) {
-                            new MasterGUI(4, "Tutorial").getGui().show(player);
+                            new MasterGUI(4, "Tutorial", player).getGui().show(player);
                             return true;
                         }
                     }
