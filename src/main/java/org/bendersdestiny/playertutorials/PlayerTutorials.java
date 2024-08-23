@@ -8,10 +8,12 @@ import org.bendersdestiny.playertutorials.manager.ItemManager;
 import org.bendersdestiny.playertutorials.manager.StorageManager;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
+import org.bukkit.command.Command;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Objects;
 import java.util.logging.Level;
 
 public final class PlayerTutorials extends JavaPlugin {
@@ -75,8 +77,8 @@ public final class PlayerTutorials extends JavaPlugin {
 	 * Utility method to register all {@link org.bukkit.command.Command} with
 	 */
 	private void registerCommands() {
-		getCommand("tutorial").setExecutor(new TutorialCommand());
-		getCommand("tutorial").setTabCompleter(new TutorialCommand());
+		Objects.requireNonNull(getCommand("tutorial")).setExecutor(new TutorialCommand());
+		Objects.requireNonNull(getCommand("tutorial")).setTabCompleter(new TutorialCommand());
 	}
 
 	/**
