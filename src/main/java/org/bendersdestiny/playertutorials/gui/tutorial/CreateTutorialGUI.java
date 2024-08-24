@@ -7,25 +7,21 @@ import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
 import lombok.Setter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
+import org.bendersdestiny.playertutorials.tutorial.Tutorial;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.chat.prompts.TutorialNamePrompt;
 import org.bendersdestiny.playertutorials.utils.item.ItemUtil;
+import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bukkit.Material;
 import org.bukkit.conversations.Conversation;
-import org.bukkit.conversations.ConversationContext;
-import org.bukkit.conversations.MessagePrompt;
-import org.bukkit.conversations.Prompt;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 @Getter
 public class CreateTutorialGUI {
@@ -44,6 +40,10 @@ public class CreateTutorialGUI {
         this.player = player;
 
         this.setupUI();
+
+        this.createChangeNameItemFunctionality();
+        this.createChangeIconItemFunctionality();
+        this.createSaveItemFunctionality();
     }
 
     private void setupUI() {
@@ -59,8 +59,35 @@ public class CreateTutorialGUI {
 
     private void createChangeNameItemFunctionality() {
         getChangeNameItem().setAction(inventoryClickEvent -> {
-            Conversation conversation = new Conversation(PlayerTutorials.getInstance(), player, new TutorialNamePrompt());
+            Conversation conversation = new Conversation(PlayerTutorials.getInstance(), this.player, new TutorialNamePrompt());
             conversation.begin();
+            this.tutorialTitle = conversation.getContext().getAllSessionData().get("tutorialname").toString();
+            if (this.tutorialTitle != null) {
+                if (this.tutorialTitle.equalsIgnoreCase("cancel")) {
+                    conversation.abandon();
+                    this.player.openInventory(this.gui.getInventory());
+                }
+            }
+        });
+    }
+
+    private void createChangeIconItemFunctionality() {
+        getChangeIconItem().setAction(inventoryClickEvent -> {
+            // new IconGUI() //TODO: Implement GUI
+        });
+    }
+
+    private void createSaveItemFunctionality() {
+        getSaveItem().setAction(inventoryClickEvent -> {
+            if (this.tutorialTitle != null) {
+                if (this.tutorialIcon != null) {
+                    Tutorial newTutorial = new Tutorial(1, this.tutorialTitle, this.tutorialIcon); // Create new Tutorial
+                    MemoryUtil.getCreatedTutorials().put(newTutorial.getId(), newTutorial);
+
+                    this.tutorialTitle = "Tutorial";
+                    this.tutorialIcon = Material.DIORITE;
+                }
+            }
         });
     }
 

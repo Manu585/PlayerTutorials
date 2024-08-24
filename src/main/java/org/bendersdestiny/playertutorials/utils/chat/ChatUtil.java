@@ -34,8 +34,7 @@ public class ChatUtil {
 			String hexColor = ChatColor.of("#" + color).toString();
 			msg = msg.replace(hexMatcher.group(0), hexColor);
 		}
-		msg = ChatColor.translateAlternateColorCodes('&', msg);
-		return msg;
+		return ChatColor.translateAlternateColorCodes('&', msg);
 	}
 
 	/**

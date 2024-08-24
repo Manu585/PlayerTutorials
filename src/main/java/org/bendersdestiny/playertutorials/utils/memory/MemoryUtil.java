@@ -84,7 +84,7 @@ public class MemoryUtil {
                 preparedStatement.setInt(3, area.getStructure().getStructureID());
                 preparedStatement.setString(4, area.getName());
                 preparedStatement.setString(5, GeneralMethods.locationToString(area.getSpawnPoint()));
-                preparedStatement.setInt(6, area.getTasks().listIterator().next().getTaskID()); // TODO: Wrong way of doing this
+                preparedStatement.setInt(6, area.getTasks().listIterator().next().getTaskID());
                 preparedStatement.setInt(7, area.getPriority());
             }
             PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all " + Area.areaColor + "Areas &7in &a" +
@@ -298,7 +298,7 @@ public class MemoryUtil {
                     case "TeleportTask":
                         loadTeleportTask(taskID, areaID, priority, connection);
                     default:
-                        PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Uknown task type! " + taskType);
+                        PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Unknown task type! " + taskType);
                         break;
                 }
             }

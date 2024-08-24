@@ -44,7 +44,7 @@ public class Tutorial {
 	/**
 	 * Existing {@link Tutorial} coming from the database constructor
 	 *
-	 * @param id Id of the tutorial
+	 * @param id ID of the tutorial
 	 * @param name Name of the tutorial
 	 * @param areas Areas of the tutorial
 	 */

@@ -7,7 +7,7 @@ import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
-import org.bendersdestiny.playertutorials.tutorial.Tutorial;
+import org.bendersdestiny.playertutorials.tutorial.area.Area;
 import org.bendersdestiny.playertutorials.tutorial.task.Task;
 import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bukkit.Material;
@@ -23,12 +23,12 @@ import java.util.List;
 public class ModifyAreaGUI {
     private final ChestGui gui;
     private final StaticPane pane;
-    private final Tutorial tutorial;
+    private final Area area;
 
-    public ModifyAreaGUI(int rows, String title, Tutorial tutorial) {
+    public ModifyAreaGUI(int rows, String title, Area area) {
         this.gui = new ChestGui(rows, title, PlayerTutorials.getInstance());
         this.pane = new StaticPane(0, 0, 9, 4, Pane.Priority.HIGH);
-        this.tutorial = tutorial;
+        this.area = area;
 
         this.setupUI();
     }
@@ -37,7 +37,7 @@ public class ModifyAreaGUI {
         this.gui.addPane(this.pane);
         this.pane.setVisible(true);
 
-        this.pane.addItem(this.changeTutorialNameItem(), Slot.fromIndex(31));
+        this.pane.addItem(this.changeAreaNameItem(), Slot.fromIndex(31));
 
         int counter = 0;
         for (GuiItem task : this.allTaskItems()) {
@@ -52,20 +52,20 @@ public class ModifyAreaGUI {
 
     private @NotNull List<GuiItem> allTaskItems() {
         List<GuiItem> items = new ArrayList<>();
-        for (Task task : MemoryUtil.getCreatedTutorials().get(tutorial.getId()).getAreas().iterator().next().getTasks()) {
+        for (Task task : MemoryUtil.getCreatedAreas().get(area.getAreaID()).getTasks()) {
             items.add(new GuiItem(task.getTaskItemStack()));
         }
         return items;
     }
 
     @Contract(" -> new")
-    private @NotNull GuiItem changeTutorialNameItem() {
+    private @NotNull GuiItem changeAreaNameItem() {
         ItemStack item = new ItemStack(Material.OAK_SIGN);
         ItemMeta meta = item.getItemMeta();
 
         if (meta == null) throw new NullPointerException("ItemMeta cannot be NULL!");
 
-        meta.setDisplayName(tutorial.getName());
+        meta.setDisplayName(area.getName());
         item.setItemMeta(meta);
 
         return new GuiItem(item);
