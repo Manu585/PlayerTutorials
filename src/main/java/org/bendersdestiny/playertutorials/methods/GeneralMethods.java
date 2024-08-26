@@ -139,7 +139,7 @@ public class GeneralMethods {
 					tutorialPlayer.getORIGINAL_ITEMS().put(i, player.getInventory().getContents()[i]);
 				}
 				player.getInventory().clear();
-				// player.getInventory().setItem(4, ItemManager.AreaSelector);
+				player.getInventory().setItem(4, PlayerTutorials.getInstance().getItemManager().getAreaSelector().item);
 				player.sendTitle(
 						ChatUtil.format("&7Select the area with the &6Axe"),
 						ChatUtil.format("&7Left click: &6Pos1&7, Right click: &6Pos2"),

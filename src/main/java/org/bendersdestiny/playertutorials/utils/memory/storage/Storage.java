@@ -30,9 +30,9 @@ public class Storage {
 				? "mysql"
 				: "sqlite";
 
-		if (storageType.equalsIgnoreCase("sqlite")) {
+		if (this.storageType.equalsIgnoreCase("sqlite")) {
 			this.setupSQLiteStorage();
-		} else if (storageType.equalsIgnoreCase("mysql")) {
+		} else if (this.storageType.equalsIgnoreCase("mysql")) {
 			this.setupMySQLStorage();
 		} else { // Wrong config input case!
 			PlayerTutorials.getInstance().getLogger().log(
@@ -57,7 +57,7 @@ public class Storage {
 		} catch (IOException ex) {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Error while creating the .db file!" + ex);
 		}
-		sqliteStorage = SQLiteStorage.getInstance(sqliteFile);
+		this.sqliteStorage = SQLiteStorage.getInstance(sqliteFile);
 	}
 
 	/**
@@ -70,17 +70,17 @@ public class Storage {
 		String host = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.host");
 		String port = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.port");
 
-		mySQLStorage = MySQLStorage.getInstance(username, password, port, host, database);
+		this.mySQLStorage = MySQLStorage.getInstance(username, password, port, host, database);
 	}
 
 	/**
 	 * Connect to the database depending on storage type
 	 */
 	public void connect() {
-		if (storageType.equalsIgnoreCase("sqlite")) {
-			sqliteStorage.connect();
-		} else if (storageType.equalsIgnoreCase("mysql")) {
-			mySQLStorage.connect();
+		if (this.storageType.equalsIgnoreCase("sqlite")) {
+			this.sqliteStorage.connect();
+		} else if (this.storageType.equalsIgnoreCase("mysql")) {
+			this.mySQLStorage.connect();
 		}
 	}
 
@@ -88,10 +88,10 @@ public class Storage {
 	 * Disconnect from the database depending on storage type
 	 */
 	public void disconnect() {
-		if (storageType.equalsIgnoreCase("sqlite")) {
-			sqliteStorage.disconnect();
-		} else if (storageType.equalsIgnoreCase("mysql")) {
-			mySQLStorage.disconnect();
+		if (this.storageType.equalsIgnoreCase("sqlite")) {
+			this.sqliteStorage.disconnect();
+		} else if (this.storageType.equalsIgnoreCase("mysql")) {
+			this.mySQLStorage.disconnect();
 		}
 	}
 
@@ -102,10 +102,10 @@ public class Storage {
 	 * @throws SQLException if there is any kind of error
 	 */
 	public Connection getConnection() throws SQLException {
-		if (storageType.equalsIgnoreCase("sqlite")) {
-			return sqliteStorage.getConnection();
-		} else if (storageType.equalsIgnoreCase("mysql")) {
-			return mySQLStorage.getConnection();
+		if (this.storageType.equalsIgnoreCase("sqlite")) {
+			return this.sqliteStorage.getConnection();
+		} else if (this.storageType.equalsIgnoreCase("mysql")) {
+			return this.mySQLStorage.getConnection();
 		} else {
 			throw new NullPointerException("Error while receiving the connection from the database!");
 		}

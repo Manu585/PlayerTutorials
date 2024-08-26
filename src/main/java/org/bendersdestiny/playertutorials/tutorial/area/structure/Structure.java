@@ -18,7 +18,7 @@ public class Structure {
     private int areaID;
     private File structureSchematic;
 
-    public static String structureColor = "#2863ed";
+    public static final String structureColor = "#2863ed";
 
     /**
      * Create a structure which already existed

@@ -21,6 +21,8 @@ public final class PlayerTutorials extends JavaPlugin {
 	@Getter
 	private Storage storage;
 	private ChatUtil chatUtil;
+	@Getter
+	private ItemManager itemManager;
 
 	/**
 	 * Runs once the server starts
@@ -30,7 +32,7 @@ public final class PlayerTutorials extends JavaPlugin {
 		instance = this;
 		chatUtil = new ChatUtil(this);
 
-		new ItemManager();
+		itemManager = new ItemManager();
 
 		this.registerCommands();
 

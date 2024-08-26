@@ -31,7 +31,7 @@ public class Area {
 	@Setter
 	private int priority;
 
-	public static String areaColor = "&#82c238";
+	public static final String areaColor = "&#82c238";
 
 	public Area(int areaID, int tutorialID, Structure structure, String name, Location spawnPoint, List<Task> tasks, int priority) {
 		this.areaID = areaID;

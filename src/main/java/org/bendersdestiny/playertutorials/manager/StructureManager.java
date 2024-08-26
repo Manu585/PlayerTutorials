@@ -21,9 +21,7 @@ public class StructureManager {
         for (int i = 0; i < tutorial.getAreas().size(); i++) {
             structure.add(tutorial.getAreas().get(i).getStructure());
         }
-        structure.forEach(structure1 -> {
-            structure1.spawn(new Location(Bukkit.getWorld("world"), 0, 5, 0));
-        });
+        structure.forEach(structure1 -> structure1.spawn(new Location(Bukkit.getWorld("world"), 0, 5, 0)));
     }
 
     public void destroyStructure() {

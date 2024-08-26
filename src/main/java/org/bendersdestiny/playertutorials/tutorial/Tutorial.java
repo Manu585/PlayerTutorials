@@ -21,12 +21,12 @@ public class Tutorial {
 	@Setter
 	private List<Area> areas;
 
-	public static String tutorialColor = "&#F2B152";
+	public static final String tutorialColor = "&#F2B152";
 
 	/**
 	 * Freshly created {@link Tutorial} constructor
 	 *
-	 * @param id Id of the tutorial
+	 * @param id ID of the tutorial
 	 * @param name Name of the tutorial
 	 * @param icon The icon display in the GUI
 	 */
