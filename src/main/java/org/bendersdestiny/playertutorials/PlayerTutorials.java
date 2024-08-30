@@ -30,9 +30,9 @@ public final class PlayerTutorials extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		instance = this;
-		chatUtil = new ChatUtil(this);
+		this.chatUtil = new ChatUtil(this);
 
-		itemManager = new ItemManager();
+		this.itemManager = new ItemManager();
 
 		this.registerCommands();
 
@@ -41,11 +41,11 @@ public final class PlayerTutorials extends JavaPlugin {
 		);
 
 		new ConfigManager(this);
-		storage = new Storage(); // ConfigManager has to be initialized first
+		this.storage = new Storage(); // ConfigManager has to be initialized first
 
 		this.loadEverythingAsync();
 
-		chatUtil.sendServerStartupMessage();
+		this.chatUtil.sendServerStartupMessage();
 	}
 
 	/**
@@ -55,11 +55,11 @@ public final class PlayerTutorials extends JavaPlugin {
     public void onDisable() {
 		this.saveEverythingAsync();
 
-		if (storage != null) {
-			storage.disconnect();
+		if (this.storage != null) {
+			this.storage.disconnect();
 		}
-		if (chatUtil != null) {
-			chatUtil.sendServerStopMessage();
+		if (this.chatUtil != null) {
+			this.chatUtil.sendServerStopMessage();
 		}
 	}
 

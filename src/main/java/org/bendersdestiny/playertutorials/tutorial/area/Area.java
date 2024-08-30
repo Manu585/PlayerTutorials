@@ -71,8 +71,8 @@ public class Area {
 	 * @param task Task to add
 	 */
 	public void addTask(Task task) {
-		if (tasks != null) {
-			tasks.add(task);
+		if (this.tasks != null) {
+			this.tasks.add(task);
 			MemoryUtil.createdTasks.put(task.getTaskID(), task);
 			switch (task.getTaskType()) {
 				case "CommandTask":
@@ -94,8 +94,8 @@ public class Area {
 	 * @param task Task to remove
 	 */
 	public void removeTask(Task task) {
-		if (tasks != null) {
-			tasks.remove(task.getPriority());
+		if (this.tasks != null) {
+			this.tasks.remove(task.getPriority());
 			MemoryUtil.createdTasks.remove(task.getTaskID());
 			switch (task.getTaskType()) {
 				case "CommandTask":

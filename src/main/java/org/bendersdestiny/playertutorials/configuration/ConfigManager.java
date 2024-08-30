@@ -16,7 +16,7 @@ public class ConfigManager {
 		defaultConfig = new Config(plugin, "config.yml");
 		languageConfig = new Config(plugin, "language.yml");
 
-		configCheck();
+		this.configCheck();
 	}
 
 	/**

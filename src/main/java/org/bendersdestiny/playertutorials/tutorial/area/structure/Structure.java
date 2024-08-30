@@ -34,11 +34,7 @@ public class Structure {
         this.structureSchematic = structureSchematic;
     }
 
-    public void spawn(Location center) {
+    public void spawn(Location center) {}
 
-    }
-
-    public void destroy(Location center) {
-
-    }
+    public void destroy(Location center) {}
 }

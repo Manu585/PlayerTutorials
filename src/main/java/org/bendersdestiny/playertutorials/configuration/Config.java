@@ -25,11 +25,11 @@ public class Config {
 	public Config(PlayerTutorials plugin, String fileName) {
 		this.plugin = plugin;
 
-		configFile = new File(plugin.getDataFolder(), fileName);
+		this.configFile = new File(plugin.getDataFolder(), fileName);
 
-		if (!configFile.exists()) {
+		if (!this.configFile.exists()) {
 			try {
-				if (configFile.getParentFile().mkdirs()) {
+				if (this.configFile.getParentFile().mkdirs()) {
 					plugin.getLogger().log(Level.INFO, "Successfully created necessary directories!");
 				}
 				plugin.saveResource(fileName, false);
@@ -38,9 +38,9 @@ public class Config {
 				plugin.getLogger().log(Level.SEVERE, "Failed to create config file: " + fileName, e);
 			}
 		}
-		config = new YamlConfiguration();
+		this.config = new YamlConfiguration();
 		try {
-			config.load(configFile);
+			this.config.load(configFile);
 		} catch (IOException | InvalidConfigurationException e) {
 			plugin.getLogger().log(Level.SEVERE, "Failed to load config file: " + fileName, e);
 		}
@@ -52,9 +52,9 @@ public class Config {
 	 */
 	public void reload() {
 		try {
-			config.load(configFile);
+			this.config.load(this.configFile);
 		} catch (IOException | InvalidConfigurationException e) {
-			plugin.getLogger().log(Level.SEVERE, "Failed to reload config file: " + configFile.getName(), e);
+			this.plugin.getLogger().log(Level.SEVERE, "Failed to reload config file: " + this.configFile.getName(), e);
 		}
 	}
 
@@ -63,10 +63,10 @@ public class Config {
 	 */
 	public void save() {
 		try {
-			config.options().copyDefaults(true);
-			config.save(configFile);
+			this.config.options().copyDefaults(true);
+			this.config.save(this.configFile);
 		} catch (IOException e) {
-			plugin.getLogger().log(Level.SEVERE, "Failed to save config file: " + configFile.getName(), e);
+			this.plugin.getLogger().log(Level.SEVERE, "Failed to save config file: " + this.configFile.getName(), e);
 		}
 	}
 
