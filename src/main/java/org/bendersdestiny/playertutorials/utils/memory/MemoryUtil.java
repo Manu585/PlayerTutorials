@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 /**
@@ -32,6 +33,8 @@ import java.util.logging.Level;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemoryUtil {
+    public static AtomicBoolean memorySetup = new AtomicBoolean(false);
+
     private static final Storage storage = PlayerTutorials.getInstance().getStorage();
 
     @Getter
@@ -46,6 +49,8 @@ public class MemoryUtil {
     public static Map<Integer, TeleportTask> createdTeleportTasks = new ConcurrentHashMap<>();
     @Getter
     public static Map<Integer, CommandTask> createdCommandTasks = new ConcurrentHashMap<>();
+    @Getter
+    public static Map<Integer, String> guiCache = new ConcurrentHashMap<>();
 
     /**
      * Saves all {@link Tutorial} to the Database
@@ -60,12 +65,32 @@ public class MemoryUtil {
                 preparedStatement.setInt(1, tutorial.getId());
                 preparedStatement.setString(2, tutorial.getName());
                 preparedStatement.setString(3, tutorial.getIcon().toString());
+                preparedStatement.executeUpdate();
             }
             PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Successfully saved all "  + Tutorial.tutorialColor + "&6Tutorials &7in &a" +
                     ((System.currentTimeMillis() - startTime) / 1000) + " &7seconds"));
         } catch (SQLException e) {
             storage.disconnect();
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("Couldn't save " + Tutorial.tutorialColor + "tutorials"), e.getMessage());
+        }
+    }
+
+    public static void saveTutorial(Tutorial tutorial) {
+        long startTime = System.currentTimeMillis();
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Saving " + Tutorial.tutorialColor + "Tutorial &7..."));
+        String query = "INSERT INTO tutorials VALUES(?,?,?)";
+        storage.connect();
+        try (Connection connection = storage.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, tutorial.getId());
+            preparedStatement.setString(2, tutorial.getName());
+            preparedStatement.setString(3, tutorial.getIcon().toString());
+            preparedStatement.executeUpdate();
+
+            PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Successfully saved tutorial in database! Took " + ((System.currentTimeMillis() - startTime) / 1000) + " seconds!"));
+        } catch (SQLException e) {
+            storage.disconnect();
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, ChatUtil.format("Couldn't save " + Tutorial.tutorialColor + "tutorial"), e.getMessage());
         }
     }
 

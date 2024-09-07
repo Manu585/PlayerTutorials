@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
@@ -100,28 +101,40 @@ public class GeneralMethods {
 	 * @param storage Storage instance
 	 * @return The ID for the tutorials table
 	 */
-	public static int createTutorialsID(Storage storage) { //TODO: Not finished yet, just a WIP version
+	public static int createTutorialsID(Storage storage) {
 		if (storage == null) {
 			throw new NullPointerException("Storage has not been initiated yet!");
 		}
+
 		storage.connect();
 		String query = "SELECT id FROM tutorials";
+		int id = 1;
+		Set<Integer> existingIds = new HashSet<>();
+
 		try (Connection connection = storage.getConnection();
-			 Statement statement = connection.createStatement()) {
-			statement.execute(query);
-			int tutorialsID = statement.getResultSet().getInt(1);
-			int id = 1;
-			while (tutorialsID == id) {
+			 Statement statement = connection.createStatement();
+			 ResultSet resultSet = statement.executeQuery(query)) {
+
+			// Collect all existing IDs in the tutorials table
+			while (resultSet.next()) {
+				existingIds.add(resultSet.getInt("id"));
+			}
+
+			// Increment id until a non-existing one is found
+			while (existingIds.contains(id)) {
 				id++;
 			}
+
 			return id;
-        } catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't create random tutorial ID");
+
+		} catch (SQLException e) {
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't create random tutorial ID", e);
 		} finally {
 			storage.disconnect();
 		}
 		throw new NullPointerException("Failed to create tutorials ID");
 	}
+
 
 	/**
 	 * Join the {@link org.bendersdestiny.playertutorials.tutorial.area.Area} Selection mode so players can

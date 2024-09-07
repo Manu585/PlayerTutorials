@@ -7,12 +7,13 @@ import org.bendersdestiny.playertutorials.listeners.TutorialListener;
 import org.bendersdestiny.playertutorials.manager.ItemManager;
 import org.bendersdestiny.playertutorials.manager.StorageManager;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
+import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.logging.Level;
+import java.util.Objects;
 
 public final class PlayerTutorials extends JavaPlugin {
 	@Getter
@@ -29,16 +30,15 @@ public final class PlayerTutorials extends JavaPlugin {
 		instance = this;
 		chatUtil = new ChatUtil(this);
 
-		new ItemManager();
-
 		this.registerCommands();
-
 		this.registerListeners(
 				new TutorialListener()
 		);
 
 		new ConfigManager(this);
 		storage = new Storage(); // ConfigManager has to be initialized first
+
+		new ItemManager();
 
 		this.loadEverythingAsync();
 
@@ -50,7 +50,7 @@ public final class PlayerTutorials extends JavaPlugin {
 	 */
 	@Override
     public void onDisable() {
-		this.saveEverythingAsync();
+//		this.saveEverythingAsync();
 
 		if (storage != null) {
 			storage.disconnect();
@@ -85,19 +85,11 @@ public final class PlayerTutorials extends JavaPlugin {
 	 * on an async thread. Uses methods from {@link StorageManager} to save.
 	 */
 	private void saveEverythingAsync() {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (Storage.tableCreationComplete.get()) {
-					StorageManager.saveAllTutorialsAsync();
-					StorageManager.saveAllAreasAsync();
-					StorageManager.saveAllTasksAsync();
-					StorageManager.saveAllStructuresAsync();
-				} else {
-					getLogger().log(Level.SEVERE, "Couldn't save any data! Async issue!");
-				}
-			}
-		}.runTaskAsynchronously(instance);
+		StorageManager.saveAllTutorialsAsync();
+		StorageManager.saveAllAreasAsync();
+		StorageManager.saveAllTasksAsync();
+		StorageManager.saveAllStructuresAsync();
+
 	}
 
 	/**
@@ -109,14 +101,11 @@ public final class PlayerTutorials extends JavaPlugin {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (Storage.tableCreationComplete.get()) {
-					StorageManager.loadAllTutorialsAsync();
-					StorageManager.loadAllAreasAsync();
-					StorageManager.loadAllTasksAsync();
-					StorageManager.loadAllStructuresAsync();
-				} else {
-					getLogger().log(Level.SEVERE, "Couldn't save any data! Async issue!");
-				}
+				StorageManager.loadAllTutorialsAsync();
+				StorageManager.loadAllAreasAsync();
+				StorageManager.loadAllTasksAsync();
+				StorageManager.loadAllStructuresAsync();
+				MemoryUtil.memorySetup.set(true);
 			}
 		}.runTaskAsynchronously(instance);
 	}

@@ -2,7 +2,6 @@ package org.bendersdestiny.playertutorials.gui;
 
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
-import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.github.stefvanschie.inventoryframework.pane.util.Slot;
@@ -15,6 +14,7 @@ import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.item.ItemUtil;
 import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,30 +28,23 @@ import java.util.List;
 public class MasterGUI {
     private final ChestGui gui;
     private final StaticPane pane;
-    private final PaginatedPane paginatedPane; // TODO: Implement paginated feature
-    private final Player player;
 
     private final List<GuiItem> tutorialItems = new ArrayList<>();
 
     private final int maxTutorialsPerPage = 24;
 
-    public MasterGUI(int rows, String title, Player player) {
-        this.gui = new ChestGui(rows, title, PlayerTutorials.getInstance());
-        this.player = player;
+    public MasterGUI() {
+        this.gui = new ChestGui(4, ChatUtil.format("&6Tutorials"), PlayerTutorials.getInstance());
         this.pane = new StaticPane(0, 0, 9, 4, Pane.Priority.HIGH);
-        this.paginatedPane = new PaginatedPane(0, 0,9, 3);
 
         this.fillTutorialItemList();
         this.setupUI();
+        this.gui.setOnGlobalClick(e -> e.setCancelled(true));
     }
 
     private void setupUI() {
         this.gui.addPane(this.pane);
-        this.paginatedPane.addPane(0, this.pane);
         this.pane.setVisible(true);
-
-        // Fill whole inventory with glass panes
-        this.pane.fillWith(ItemUtil.getFillerItem());
 
         // Add all tutorials to the gui
         int counter = 0;
@@ -60,8 +53,11 @@ public class MasterGUI {
             counter += 1;
         }
 
+        // Fill whole inventory with glass panes
+        this.pane.fillWith(ItemUtil.getFillerItem());
+
         // Remove bad looking Glass Pane
-        for (int i = counter; i < this.maxTutorialsPerPage; i++) {
+        for (int i = 27; i <= 35; i++) {
             this.pane.removeItem(Slot.fromIndex(i));
         }
 
@@ -70,27 +66,18 @@ public class MasterGUI {
             tutorialItem.setAction(e -> {
                 if (tutorialItem.getItem().getItemMeta() == null) throw new NullPointerException("ItemMeta cannot be null!");
 
-                this.player.closeInventory();
-                this.player.openInventory(new ModifyTutorialGUI(
-                        3,
-                        ChatUtil.format("&6Modify " + tutorialItem.getItem().getItemMeta().getDisplayName()),
-                        MemoryUtil.getCreatedTutorials().get(tutorialItem.getItem().getItemMeta().getCustomModelData()))
-                        .getGui().getInventory());
+                HumanEntity whoClicked = e.getWhoClicked();
+                if (whoClicked instanceof Player p) {
+                    p.closeInventory();
+                    new ModifyTutorialGUI(
+                            3,
+                            ChatUtil.format("&6Modify " + tutorialItem.getItem().getItemMeta().getDisplayName()),
+                            MemoryUtil.getCreatedTutorials().get(tutorialItem.getItem().getItemMeta().getCustomModelData())).getGui().show(p);
+                }
             });
         }
 
-        // Add create tutorial item + functionality
         this.pane.addItem(getCreateTutorialItem(), Slot.fromIndex(31));
-
-        getCreateTutorialItem().setAction(e -> {
-            if (e.getClickedInventory() == this.gui.getInventory()) {
-                this.player.closeInventory();
-                this.player.openInventory(new CreateTutorialGUI( // Open the CreateTutorialGUI
-                        4,
-                        ChatUtil.format("&aCreate Tutorial"),
-                        this.player).getGui().getInventory());
-            }
-        });
     }
 
     @Contract(" -> new")
@@ -103,16 +90,23 @@ public class MasterGUI {
         itemMeta.setDisplayName(ChatUtil.format("&aCreate Tutorial"));
         createTutorialItem.setItemMeta(itemMeta);
 
-        return new GuiItem(createTutorialItem);
+        return new GuiItem(createTutorialItem, event -> {
+            HumanEntity whoClicked = event.getWhoClicked();
+            if (whoClicked instanceof Player p) {
+                p.closeInventory();
+                new CreateTutorialGUI().getGui().show(p);
+            }
+        });
     }
 
-    private void fillTutorialItemList() {
+    void fillTutorialItemList() {
         for (Tutorial tutorial : MemoryUtil.getCreatedTutorials().values()) {
             ItemStack tutorialItemStack = new ItemStack(tutorial.getIcon());
             ItemMeta tutorialItemMeta = tutorialItemStack.getItemMeta();
 
             if (tutorialItemMeta == null) throw new NullPointerException("ItemMeta cannot be null");
 
+            tutorialItemMeta.setDisplayName(tutorial.getName());
             tutorialItemMeta.setCustomModelData(tutorial.getId());
             tutorialItemStack.setItemMeta(tutorialItemMeta);
 

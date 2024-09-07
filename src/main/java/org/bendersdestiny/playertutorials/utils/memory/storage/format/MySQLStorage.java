@@ -2,12 +2,10 @@ package org.bendersdestiny.playertutorials.utils.memory.storage.format;
 
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 @Getter
@@ -19,7 +17,6 @@ public class MySQLStorage {
 	protected final String host;
 	protected final String database;
 
-	private AtomicBoolean connected = new AtomicBoolean(false);
 	private Connection connection;
 
 	/**
@@ -61,39 +58,27 @@ public class MySQLStorage {
 	 * The MySQL way of connecting to the Database
 	 */
 	public void connect() {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				try {
-					String connectionString = "jdbc:mysql://" + host + ":" + port + "/" + database;
-					connection = DriverManager.getConnection(connectionString, username, password);
-					PlayerTutorials.getInstance().getLogger().log(Level.INFO, "MySQL connection established.");
-					connected.set(true);
-				} catch (SQLException e) {
-					PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "MySQL connection failed.", e);
-				}
-			}
-		}.runTaskAsynchronously(PlayerTutorials.getInstance());
+		try {
+			String connectionString = "jdbc:mysql://" + host + ":" + port + "/" + database;
+			connection = DriverManager.getConnection(connectionString, username, password);
+			PlayerTutorials.getInstance().getLogger().log(Level.INFO, "MySQL connection established.");
+		} catch (SQLException e) {
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "MySQL connection failed.", e);
+		}
 	}
 
 	/**
 	 * The MySQL way of disconnecting from the Database
 	 */
 	public void disconnect() {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (connection != null) {
-					try {
-						if (!connection.isClosed()) {
-							connection.close();
-							connected.set(false);
-						}
-					} catch (SQLException e) {
-						PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Error while disconnecting from database!", e);
-					}
+		if (connection != null) {
+			try {
+				if (!connection.isClosed()) {
+					connection.close();
 				}
+			} catch (SQLException e) {
+				PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Error while disconnecting from database!", e);
 			}
-		}.runTaskAsynchronously(PlayerTutorials.getInstance());
+		}
 	}
 }

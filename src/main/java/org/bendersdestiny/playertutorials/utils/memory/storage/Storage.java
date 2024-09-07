@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 @Getter
@@ -18,8 +17,6 @@ public class Storage {
 	private String storageType;
 	private SQLiteStorage sqliteStorage;
 	private MySQLStorage mySQLStorage;
-
-	public static AtomicBoolean tableCreationComplete = new AtomicBoolean(false);
 
 	/**
 	 * The {@link Storage} object represents the storage in the PlayerTutorials plugin.
@@ -121,8 +118,6 @@ public class Storage {
 		this.createTasksTable();
 		this.createCommandTaskTable();
 		this.createTeleportTaskTable();
-
-		tableCreationComplete.set(true);
 	}
 
 	/**
