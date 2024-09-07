@@ -18,15 +18,11 @@ public class StructureManager {
 
     public void spawnStructure() {
         List<Structure> structure = new java.util.ArrayList<>();
-        for (int i = 0; i < tutorial.getAreas().size(); i++) {
-            structure.add(tutorial.getAreas().get(i).getStructure());
+        for (int i = 0; i < this.tutorial.getAreas().size(); i++) {
+            structure.add(this.tutorial.getAreas().get(i).getStructure());
         }
-        structure.forEach(structure1 -> {
-            structure1.spawn(new Location(Bukkit.getWorld("world"), 0, 5, 0));
-        });
+        structure.forEach(structure1 -> structure1.spawn(new Location(Bukkit.getWorld("world"), 0, 5, 0))); // Everything wrong with that
     }
 
-    public void destroyStructure() {
-
-    }
+    public void destroyStructure() {}
 }

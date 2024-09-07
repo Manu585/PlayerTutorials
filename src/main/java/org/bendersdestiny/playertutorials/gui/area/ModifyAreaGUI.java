@@ -52,7 +52,7 @@ public class ModifyAreaGUI {
 
     private @NotNull List<GuiItem> allTaskItems() {
         List<GuiItem> items = new ArrayList<>();
-        for (Task task : MemoryUtil.getCreatedAreas().get(area.getAreaID()).getTasks()) {
+        for (Task task : MemoryUtil.getCreatedAreas().get(this.area.getAreaID()).getTasks()) {
             items.add(new GuiItem(task.getTaskItemStack()));
         }
         return items;
@@ -65,7 +65,7 @@ public class ModifyAreaGUI {
 
         if (meta == null) throw new NullPointerException("ItemMeta cannot be NULL!");
 
-        meta.setDisplayName(area.getName());
+        meta.setDisplayName(this.area.getName());
         item.setItemMeta(meta);
 
         return new GuiItem(item);

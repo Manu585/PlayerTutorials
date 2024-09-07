@@ -31,7 +31,7 @@ public class Area {
 	@Setter
 	private int priority;
 
-	public static String areaColor = "&#82c238";
+	public static final String areaColor = "&#82c238";
 
 	public Area(int areaID, int tutorialID, Structure structure, String name, Location spawnPoint, List<Task> tasks, int priority) {
 		this.areaID = areaID;
@@ -71,8 +71,8 @@ public class Area {
 	 * @param task Task to add
 	 */
 	public void addTask(Task task) {
-		if (tasks != null) {
-			tasks.add(task);
+		if (this.tasks != null) {
+			this.tasks.add(task);
 			MemoryUtil.createdTasks.put(task.getTaskID(), task);
 			switch (task.getTaskType()) {
 				case "CommandTask":
@@ -94,8 +94,8 @@ public class Area {
 	 * @param task Task to remove
 	 */
 	public void removeTask(Task task) {
-		if (tasks != null) {
-			tasks.remove(task.getPriority());
+		if (this.tasks != null) {
+			this.tasks.remove(task.getPriority());
 			MemoryUtil.createdTasks.remove(task.getTaskID());
 			switch (task.getTaskType()) {
 				case "CommandTask":

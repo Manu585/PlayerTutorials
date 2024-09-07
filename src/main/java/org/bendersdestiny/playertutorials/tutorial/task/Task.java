@@ -23,7 +23,7 @@ public abstract class Task {
 	@Setter
 	private int priority;
 
-	public static String taskColor = "#ed28b2";
+	public static final String taskColor = "#ed28b2";
 
 	/**
 	 * A {@link Task} is like the name implies, a task which has to be executed by a player or the console.
@@ -46,7 +46,7 @@ public abstract class Task {
 	 * @return the {@link Task} {@link ItemStack}
 	 */
 	public ItemStack getTaskItemStack() {
-		switch (taskType) {
+		switch (this.taskType) {
 			case "CommandTask":
 				ItemStack commandTaskItem = new ItemStack(Material.COMMAND_BLOCK);
 				ItemMeta commantTaskItemMeta = commandTaskItem.getItemMeta();
@@ -78,7 +78,7 @@ public abstract class Task {
 
 				return teleportTaskItem;
 			default:
-				throw new IllegalArgumentException("Invalid task type: " + taskType);
+				throw new IllegalArgumentException("Invalid task type: " + this.taskType);
         }
     }
 }

@@ -29,8 +29,8 @@ public class TutorialManager {
 	 * Start the {@link Tutorial}
 	 */
 	public void start() {
-		if (tutorial != null) {
-			TutorialPlayer.getPlayer(player.getUniqueId());
+		if (this.tutorial != null) {
+			TutorialPlayer.getPlayer(this.player.getUniqueId());
 		}
 	}
 
@@ -38,8 +38,8 @@ public class TutorialManager {
 	 * Stop the {@link Tutorial}
 	 */
 	public void stop() {
-		if (tutorial != null) {
-			TutorialPlayer.removePlayer(player.getUniqueId());
+		if (this.tutorial != null) {
+			TutorialPlayer.removePlayer(this.player.getUniqueId());
 		}
 	}
 }

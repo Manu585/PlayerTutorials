@@ -29,7 +29,7 @@ public class TeleportTask extends Task {
 	 */
 	public void teleportPlayerToNewLocation(Player player) {
 		if (player != null) {
-			player.teleport(to);
+			player.teleport(this.to);
 		} else {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while trying to teleport player to new location!\nLocation: " + GeneralMethods.locationToString(to));
 		}
@@ -43,7 +43,7 @@ public class TeleportTask extends Task {
 	 */
 	public void resetPlayerToOldLocation(Player player){
 		if (player != null) {
-			player.teleport(from);
+			player.teleport(this.from);
 		} else {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Error while trying to teleport player back to old location!");
 		}

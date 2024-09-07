@@ -24,7 +24,8 @@ public class ItemManager {
 
         areaSelector = new AreaSelector(
                 ChatUtil.format(config.getString(path + "areaselector.name")),
-                config.getStringList(path + "areaselector.lore").stream()
+                config.getStringList(path + "areaselector.lore")
+                        .stream()
                         .map(ChatUtil::format)
                         .collect(Collectors.toList()),
                 Material.valueOf(config.getString(path + "material", "WOODEN_AXE")));
