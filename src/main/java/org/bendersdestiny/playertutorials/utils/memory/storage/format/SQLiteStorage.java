@@ -1,11 +1,12 @@
 package org.bendersdestiny.playertutorials.utils.memory.storage.format;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
@@ -13,24 +14,18 @@ import java.util.logging.Level;
 public class SQLiteStorage {
 	private static SQLiteStorage instance;
 	private final File file;
+	private final HikariDataSource dataSource;
 	private Connection connection;
 
-	/**
-	 * The SQLite Storage type
-	 *
-	 * @param file .db file
-	 */
 	private SQLiteStorage(File file) {
 		this.file = file;
+
+		HikariConfig config = new HikariConfig();
+		config.setJdbcUrl("jdbc:sqlite:" + file.getAbsolutePath());
+
+		this.dataSource = new HikariDataSource(config);
 	}
 
-	/**
-	 * Instance of the {@link SQLiteStorage}
-	 *
-	 * @param file .db {@link File}
-	 *
-	 * @return the instance
-	 */
 	public static SQLiteStorage getInstance(File file) {
 		if (instance == null) {
 			instance = new SQLiteStorage(file);
@@ -38,29 +33,27 @@ public class SQLiteStorage {
 		return instance;
 	}
 
-	/**
-	 * The SQLite way of connecting to the database
-	 */
-	public void connect() {
-		try {
-			String connectionString = "jdbc:sqlite:" + file.getAbsolutePath();
-			connection = DriverManager.getConnection(connectionString);
-			PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully connected to local database!");
-		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to connect to local database!" + e.getMessage());
+	public Connection getConnection() throws SQLException {
+		// Only request connection from the pool when needed
+		if (connection == null || connection.isClosed()) {
+			connection = dataSource.getConnection();
 		}
+		return connection;
 	}
 
-	/**
-	 * The SQLite way of disconnecting from the database
-	 */
 	public void disconnect() {
-		try {
-			if (connection != null && !connection.isClosed()) {
-				connection.close();
+		if (connection != null) {
+			try {
+				if (!connection.isClosed()) {
+					connection.close();
+				}
+			} catch (SQLException e) {
+				PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to close local database!" + e.getMessage());
 			}
-		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to close local database!" + e.getMessage());
+		}
+
+		if (dataSource != null) {
+			dataSource.close();
 		}
 	}
 }

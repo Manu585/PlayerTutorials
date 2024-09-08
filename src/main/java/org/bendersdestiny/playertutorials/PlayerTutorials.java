@@ -19,11 +19,10 @@ public final class PlayerTutorials extends JavaPlugin {
 	private static PlayerTutorials instance;
 	@Getter
 	private Storage storage;
+	@Getter
+	private ItemManager itemManager;
 	private ChatUtil chatUtil;
 
-	/**
-	 * Runs once the server starts
-	 */
 	@Override
 	public void onEnable() {
 		instance = this;
@@ -35,20 +34,18 @@ public final class PlayerTutorials extends JavaPlugin {
 		);
 
 		new ConfigManager(this);
-		storage = new Storage(); // ConfigManager has to be initialized first
+		storage = new Storage(); // Setup storage after config is initialized!!
 
-		new ItemManager();
+		itemManager = new ItemManager();
 
 		this.loadEverythingAsync();
 
 		chatUtil.sendServerStartupMessage();
 	}
 
-	/**
-	 * Runs once the server closes
-	 */
 	@Override
-    public void onDisable() {
+	public void onDisable() {
+		// Close database connections cleanly
 		if (storage != null) {
 			storage.disconnect();
 		}
@@ -57,30 +54,17 @@ public final class PlayerTutorials extends JavaPlugin {
 		}
 	}
 
-	/**
-	 * Registers all {@link Listener} in the {@link java.util.List}
-	 *
-	 * @param listeners Listeners List
-	 */
 	private void registerListeners(Listener... listeners) {
 		for (Listener listener : listeners) {
 			getServer().getPluginManager().registerEvents(listener, this);
 		}
 	}
 
-	/**
-	 * Utility method to register all {@link org.bukkit.command.Command} with
-	 */
 	private void registerCommands() {
 		Objects.requireNonNull(getCommand("tutorial")).setExecutor(new TutorialCommand());
 		Objects.requireNonNull(getCommand("tutorial")).setTabCompleter(new TutorialCommand());
 	}
 
-	/**
-	 * Loads every {@link org.bendersdestiny.playertutorials.tutorial.Tutorial}, {@link org.bendersdestiny.playertutorials.tutorial.area.Area}
-	 * {@link org.bendersdestiny.playertutorials.tutorial.task.Task} and {@link org.bendersdestiny.playertutorials.tutorial.area.structure.Structure}
-	 * on an async thread. Uses methods from {@link StorageManager} to load.
-	 */
 	private void loadEverythingAsync() {
 		new BukkitRunnable() {
 			@Override

@@ -1,10 +1,11 @@
 package org.bendersdestiny.playertutorials.utils.memory.storage.format;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
@@ -17,36 +18,27 @@ public class MySQLStorage {
 	protected final String host;
 	protected final String database;
 
+	private final HikariDataSource dataSource;
 	private Connection connection;
 
-	/**
-	 * The MySQL Storage type object
-	 *
-	 * @param username Database Username
-	 * @param password Database Password
-	 * @param port Database Port
-	 * @param host Database Host
-	 * @param database Database Name
-	 */
 	private MySQLStorage(String username, String password, String port, String host, String database) {
 		this.username = username;
 		this.password = password;
 		this.port = port;
 		this.host = host;
 		this.database = database;
+
+		HikariConfig config = new HikariConfig();
+		config.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + database);
+		config.setUsername(username);
+		config.setPassword(password);
+		config.addDataSourceProperty("cachePrepStmts", "true");
+		config.addDataSourceProperty("prepStmtCacheSize", "250");
+		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+
+		this.dataSource = new HikariDataSource(config);
 	}
 
-	/**
-	 * Instance of the {@link MySQLStorage}
-	 *
-	 * @param username Database Username
-	 * @param password Database Password
-	 * @param port Database Port
-	 * @param host Database host
-	 * @param database Database name
-	 *
-	 * @return the instance
-	 */
 	public static MySQLStorage getInstance(String username, String password, String port, String host, String database) {
 		if (instance == null) {
 			instance = new MySQLStorage(username, password, port, host, database);
@@ -54,22 +46,14 @@ public class MySQLStorage {
 		return instance;
 	}
 
-	/**
-	 * The MySQL way of connecting to the Database
-	 */
-	public void connect() {
-		try {
-			String connectionString = "jdbc:mysql://" + host + ":" + port + "/" + database;
-			connection = DriverManager.getConnection(connectionString, username, password);
-			PlayerTutorials.getInstance().getLogger().log(Level.INFO, "MySQL connection established.");
-		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "MySQL connection failed.", e);
+	public Connection getConnection() throws SQLException {
+		// Only request connection from the pool when needed
+		if (connection == null || connection.isClosed()) {
+			connection = dataSource.getConnection();
 		}
+		return connection;
 	}
 
-	/**
-	 * The MySQL way of disconnecting from the Database
-	 */
 	public void disconnect() {
 		if (connection != null) {
 			try {
@@ -79,6 +63,10 @@ public class MySQLStorage {
 			} catch (SQLException e) {
 				PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Error while disconnecting from database!", e);
 			}
+		}
+
+		if (dataSource != null) {
+			dataSource.close();
 		}
 	}
 }

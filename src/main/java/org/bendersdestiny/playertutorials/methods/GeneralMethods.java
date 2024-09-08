@@ -106,7 +106,6 @@ public class GeneralMethods {
 			throw new NullPointerException("Storage has not been initiated yet!");
 		}
 
-		storage.connect();
 		String query = "SELECT id FROM tutorials";
 		int id = 1;
 		Set<Integer> existingIds = new HashSet<>();
@@ -129,8 +128,6 @@ public class GeneralMethods {
 
 		} catch (SQLException e) {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't create random tutorial ID", e);
-		} finally {
-			storage.disconnect();
 		}
 		throw new NullPointerException("Failed to create tutorials ID");
 	}
