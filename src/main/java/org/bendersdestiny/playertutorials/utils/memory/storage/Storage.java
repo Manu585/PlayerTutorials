@@ -18,10 +18,6 @@ public class Storage {
 	private SQLiteStorage sqliteStorage;
 	private MySQLStorage mySQLStorage;
 
-	/**
-	 * The {@link Storage} object represents the storage in the PlayerTutorials plugin.
-	 * It manages the Storage type, tables and connections.
-	 */
 	public Storage() {
 		this.storageType = Objects.requireNonNull(ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.type")).equalsIgnoreCase("mysql")
 				? "mysql"
@@ -31,20 +27,16 @@ public class Storage {
 			this.setupSQLiteStorage();
 		} else if (this.storageType.equalsIgnoreCase("mysql")) {
 			this.setupMySQLStorage();
-		} else { // Wrong config input case!
-			PlayerTutorials.getInstance().getLogger().log(
-					Level.WARNING,
-					"Wrong option in config.yml 'playertutorials.storage.type'." +
-					"Viable options: 'mysql' or 'sqlite'! Defaulting to 'sqlite'.");
+		} else {
+			PlayerTutorials.getInstance().getLogger().log(Level.WARNING,
+					"Wrong option in config.yml 'playertutorials.storage.type'. " +
+							"Viable options: 'mysql' or 'sqlite'! Defaulting to 'sqlite'.");
 			this.storageType = "sqlite";
 			this.setupSQLiteStorage();
 		}
 		this.createAllTables();
 	}
 
-	/**
-	 * Sets up the SQLite Storage functionality
-	 */
 	private void setupSQLiteStorage() {
 		File sqliteFile = new File(PlayerTutorials.getInstance().getDataFolder(), "storage.db");
 		try {
@@ -57,9 +49,6 @@ public class Storage {
 		this.sqliteStorage = SQLiteStorage.getInstance(sqliteFile);
 	}
 
-	/**
-	 * Sets up the MYSQL Storage functionality
-	 */
 	private void setupMySQLStorage() {
 		String username = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.username");
 		String password = ConfigManager.defaultConfig.getConfig().getString("playertutorials.storage.mysql.password");
@@ -70,34 +59,6 @@ public class Storage {
 		this.mySQLStorage = MySQLStorage.getInstance(username, password, port, host, database);
 	}
 
-	/**
-	 * Connect to the database depending on storage type
-	 */
-	public void connect() {
-		if (this.storageType.equalsIgnoreCase("sqlite")) {
-			this.sqliteStorage.connect();
-		} else if (this.storageType.equalsIgnoreCase("mysql")) {
-			this.mySQLStorage.connect();
-		}
-	}
-
-	/**
-	 * Disconnect from the database depending on storage type
-	 */
-	public void disconnect() {
-		if (this.storageType.equalsIgnoreCase("sqlite")) {
-			this.sqliteStorage.disconnect();
-		} else if (this.storageType.equalsIgnoreCase("mysql")) {
-			this.mySQLStorage.disconnect();
-		}
-	}
-
-	/**
-	 * Gets the {@link Connection} object depending on the storage type
-	 *
-	 * @return the {@link Connection} object depending on storage type
-	 * @throws SQLException if there is any kind of error
-	 */
 	public Connection getConnection() throws SQLException {
 		if (this.storageType.equalsIgnoreCase("sqlite")) {
 			return this.sqliteStorage.getConnection();
@@ -108,9 +69,14 @@ public class Storage {
 		}
 	}
 
-	/**
-	 * Helper method to create all necessary tables with
-	 */
+	public void disconnect() {
+		if (this.storageType.equalsIgnoreCase("sqlite")) {
+			this.sqliteStorage.disconnect();
+		} else if (this.storageType.equalsIgnoreCase("mysql")) {
+			this.mySQLStorage.disconnect();
+		}
+	}
+
 	private void createAllTables() {
 		this.createTutorialTable();
 		this.createAreaTable();
@@ -124,7 +90,6 @@ public class Storage {
 	 * Creates the tutorial table for all created tutorials
 	 */
 	public void createTutorialTable() {
-		this.connect();
 		String query =
 				"CREATE TABLE IF NOT EXISTS tutorials (" +
 						"id INTEGER PRIMARY KEY," +
@@ -135,7 +100,6 @@ public class Storage {
 			 Statement statement = connection.createStatement()) {
 			statement.execute(query);
 		} catch (SQLException e) {
-			this.disconnect();
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create tutorials table!", e);
 		}
 	}
@@ -144,7 +108,6 @@ public class Storage {
 	 * Creates the area table for all created tutorial areas
 	 */
 	public void createAreaTable() {
-        this.connect();
         String query =
 				"CREATE TABLE IF NOT EXISTS areas (" +
 						"areaID INTEGER PRIMARY KEY," +
@@ -160,7 +123,6 @@ public class Storage {
              Statement statement = connection.createStatement()) {
             statement.execute(query);
         } catch (SQLException e) {
-			this.disconnect();
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create areas table!", e);
         }
     }
@@ -169,7 +131,6 @@ public class Storage {
 	 * Creates the structure table
 	 */
 	public void createStructuresTable() {
-		this.connect();
 		String query =
 				"CREATE TABLE IF NOT EXISTS structures (" +
 						"structureID INTEGER PRIMARY KEY," +
@@ -189,7 +150,6 @@ public class Storage {
 	 * Creates the tasks table
 	 */
 	public void createTasksTable() {
-		this.connect();
 		String query =
 				"CREATE TABLE IF NOT EXISTS tasks (" +
 						"taskID INTEGER PRIMARY KEY," +
@@ -202,7 +162,6 @@ public class Storage {
 			 Statement statement = connection.createStatement()) {
 			statement.execute(query);
 		} catch (SQLException e) {
-			this.disconnect();
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create tasks table!", e);
 		}
 	}
@@ -211,7 +170,6 @@ public class Storage {
 	 * Create the teleport tasks table
 	 */
 	public void createTeleportTaskTable() {
-		this.connect();
 		String query =
 				"CREATE TABLE IF NOT EXISTS teleport_tasks (" +
 						"taskID INTEGER PRIMARY KEY," +
@@ -223,7 +181,6 @@ public class Storage {
 			Statement statement = connection.createStatement()) {
 			statement.execute(query);
 		} catch (SQLException e) {
-			this.disconnect();
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create teleport tasks table!", e);
 		}
 	}
@@ -232,7 +189,6 @@ public class Storage {
 	 * Create the command tasks table
 	 */
 	public void createCommandTaskTable() {
-		this.connect();
 		String query =
 				"CREATE TABLE IF NOT EXISTS command_tasks (" +
 						"taskID INTEGER PRIMARY KEY," +
@@ -243,7 +199,6 @@ public class Storage {
 			 Statement statement = connection.createStatement()) {
 			statement.execute(query);
 		} catch (SQLException e) {
-			this.disconnect();
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create command tasks table!", e);
 		}
 	}
