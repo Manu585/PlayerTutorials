@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 /**
@@ -33,8 +32,6 @@ import java.util.logging.Level;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemoryUtil {
-    public static AtomicBoolean memorySetup = new AtomicBoolean(false);
-
     private static final Storage storage = PlayerTutorials.getInstance().getStorage();
 
     @Getter
@@ -112,6 +109,29 @@ public class MemoryUtil {
                 preparedStatement.setInt(6, area.getTasks().listIterator().next().getTaskID());
                 preparedStatement.setInt(7, area.getPriority());
             }
+            PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all " + Area.areaColor + "Areas &7in &a" +
+                    ((System.currentTimeMillis() - startTime) / 1000) + " &7seconds");
+        } catch (SQLException e) {
+            storage.disconnect();
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't save areas", e.getMessage());
+        }
+    }
+
+    public static void saveArea(Area area) {
+        long startTime = System.currentTimeMillis();
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Saving " + Area.areaColor + "Areas &7..."));
+        String query = "INSERT INTO areas VALUES(?,?,?,?,?,?,?)";
+        try (Connection connection = storage.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, area.getAreaID());
+            preparedStatement.setInt(2, area.getTutorialID());
+            preparedStatement.setInt(3, area.getStructure().getStructureID());
+            preparedStatement.setString(4, area.getName());
+            preparedStatement.setString(5, GeneralMethods.locationToString(area.getSpawnPoint()));
+            preparedStatement.setInt(6, area.getTasks().listIterator().next().getTaskID());
+            preparedStatement.setInt(7, area.getPriority());
+            preparedStatement.executeUpdate();
+
             PlayerTutorials.getInstance().getLogger().log(Level.INFO, "Successfully saved all " + Area.areaColor + "Areas &7in &a" +
                     ((System.currentTimeMillis() - startTime) / 1000) + " &7seconds");
         } catch (SQLException e) {

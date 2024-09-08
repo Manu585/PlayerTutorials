@@ -7,7 +7,6 @@ import org.bendersdestiny.playertutorials.listeners.TutorialListener;
 import org.bendersdestiny.playertutorials.manager.ItemManager;
 import org.bendersdestiny.playertutorials.manager.StorageManager;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
-import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,8 +49,6 @@ public final class PlayerTutorials extends JavaPlugin {
 	 */
 	@Override
     public void onDisable() {
-//		this.saveEverythingAsync();
-
 		if (storage != null) {
 			storage.disconnect();
 		}
@@ -80,19 +77,6 @@ public final class PlayerTutorials extends JavaPlugin {
 	}
 
 	/**
-	 * Saves every {@link org.bendersdestiny.playertutorials.tutorial.Tutorial}, {@link org.bendersdestiny.playertutorials.tutorial.area.Area}
-	 * {@link org.bendersdestiny.playertutorials.tutorial.task.Task} and {@link org.bendersdestiny.playertutorials.tutorial.area.structure.Structure}
-	 * on an async thread. Uses methods from {@link StorageManager} to save.
-	 */
-	private void saveEverythingAsync() {
-		StorageManager.saveAllTutorialsAsync();
-		StorageManager.saveAllAreasAsync();
-		StorageManager.saveAllTasksAsync();
-		StorageManager.saveAllStructuresAsync();
-
-	}
-
-	/**
 	 * Loads every {@link org.bendersdestiny.playertutorials.tutorial.Tutorial}, {@link org.bendersdestiny.playertutorials.tutorial.area.Area}
 	 * {@link org.bendersdestiny.playertutorials.tutorial.task.Task} and {@link org.bendersdestiny.playertutorials.tutorial.area.structure.Structure}
 	 * on an async thread. Uses methods from {@link StorageManager} to load.
@@ -105,7 +89,6 @@ public final class PlayerTutorials extends JavaPlugin {
 				StorageManager.loadAllAreasAsync();
 				StorageManager.loadAllTasksAsync();
 				StorageManager.loadAllStructuresAsync();
-				MemoryUtil.memorySetup.set(true);
 			}
 		}.runTaskAsynchronously(instance);
 	}
