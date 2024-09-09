@@ -2,6 +2,7 @@ package org.bendersdestiny.playertutorials.gui;
 
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
+import com.github.stefvanschie.inventoryframework.gui.type.util.Gui;
 import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.github.stefvanschie.inventoryframework.pane.util.Slot;
@@ -23,15 +24,22 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class MasterGUI {
     private final ChestGui gui;
     private final StaticPane pane;
 
+    private final int guiID = 0;
+
     private final List<GuiItem> tutorialItems = new ArrayList<>();
 
     private final int maxTutorialsPerPage = 24;
+
+    private final Map<Integer, Gui> guiMap = new ConcurrentHashMap<>();
+
 
     public MasterGUI() {
         this.gui = new ChestGui(4, ChatUtil.format("&6Tutorials"), PlayerTutorials.getInstance());
@@ -69,14 +77,19 @@ public class MasterGUI {
                 HumanEntity whoClicked = e.getWhoClicked();
                 if (whoClicked instanceof Player p) {
                     p.closeInventory();
-                    new ModifyTutorialGUI(
+                    ModifyTutorialGUI gui = new ModifyTutorialGUI(
                             3,
                             ChatUtil.format("&6Modify " + tutorialItem.getItem().getItemMeta().getDisplayName()),
-                            MemoryUtil.getCreatedTutorials().get(tutorialItem.getItem().getItemMeta().getCustomModelData())).getGui().show(p);
+                            MemoryUtil.getCreatedTutorials().get(tutorialItem.getItem().getItemMeta().getCustomModelData()));
+
+                    guiMap.put(this.getGuiID(), gui.getGui());
+                    MemoryUtil.getActiveInventories().put(p.getUniqueId(), guiMap);
+                    if (MemoryUtil.getActiveInventories().get(p.getUniqueId()) != null) {
+                        MemoryUtil.getActiveInventories().get(p.getUniqueId()).get(this.getGuiID()).show(p);
+                    }
                 }
             });
         }
-
         this.pane.addItem(getCreateTutorialItem(), Slot.fromIndex(31));
     }
 
@@ -94,7 +107,11 @@ public class MasterGUI {
             HumanEntity whoClicked = event.getWhoClicked();
             if (whoClicked instanceof Player p) {
                 p.closeInventory();
-                new CreateTutorialGUI().getGui().show(p);
+                CreateTutorialGUI gui = new CreateTutorialGUI();
+                MemoryUtil.getActiveInventories().put(p.getUniqueId(), gui.getGui());
+                if (MemoryUtil.getActiveInventories().get(p.getUniqueId()) != null) {
+                    MemoryUtil.getActiveInventories().get(p.getUniqueId()).show(p);
+                }
             }
         });
     }
