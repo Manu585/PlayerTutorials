@@ -30,7 +30,7 @@ import java.util.logging.Level;
  * Helps with loading and saving all {@link Tutorial}, {@link Area},
  * {@link Task} and {@link Structure}!
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE) @SuppressWarnings("all")
 public class MemoryUtil {
     private static final Storage storage = PlayerTutorials.getInstance().getStorage();
 

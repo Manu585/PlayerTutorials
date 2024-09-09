@@ -12,7 +12,7 @@ import java.sql.*;
 import java.util.Objects;
 import java.util.logging.Level;
 
-@Getter
+@Getter @SuppressWarnings("all")
 public class Storage {
 	private String storageType;
 	private SQLiteStorage sqliteStorage;
