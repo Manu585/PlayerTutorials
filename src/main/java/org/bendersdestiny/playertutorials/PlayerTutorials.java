@@ -7,6 +7,7 @@ import org.bendersdestiny.playertutorials.listeners.TutorialListener;
 import org.bendersdestiny.playertutorials.manager.ItemManager;
 import org.bendersdestiny.playertutorials.manager.StorageManager;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
+import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -73,6 +74,9 @@ public final class PlayerTutorials extends JavaPlugin {
 				StorageManager.loadAllAreasAsync();
 				StorageManager.loadAllTasksAsync();
 				StorageManager.loadAllStructuresAsync();
+
+				// Adds all loaded areas to the coresponding tutorials
+				MemoryUtil.finishTutorials();
 			}
 		}.runTaskAsynchronously(instance);
 	}

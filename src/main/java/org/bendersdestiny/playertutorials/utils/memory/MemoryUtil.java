@@ -1,7 +1,5 @@
 package org.bendersdestiny.playertutorials.utils.memory;
 
-import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
-import com.github.stefvanschie.inventoryframework.gui.type.util.Gui;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -51,8 +48,6 @@ public class MemoryUtil {
     public static Map<Integer, CommandTask> createdCommandTasks = new ConcurrentHashMap<>();
     @Getter
     public static Map<Integer, String> guiCache = new ConcurrentHashMap<>();
-    @Getter
-    public static Map<UUID, Map<Integer, Gui>> activeInventories = new ConcurrentHashMap<>();
 
     public static void saveTutorials() {
         long startTime = System.currentTimeMillis();
@@ -363,6 +358,13 @@ public class MemoryUtil {
                     "&5Structures &7loaded in &a" + ((System.currentTimeMillis() - loadingStartTime) / 1000) + "&7seconds!"));
         } catch (SQLException e) {
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't load all structures!", e);
+        }
+    }
+
+    // TEMPORARY
+    public static void finishTutorials() {
+        for (Area area : createdAreas.values()) {
+            createdTutorials.get(area.getTutorialID()).addArea(area);
         }
     }
 }

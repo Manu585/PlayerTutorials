@@ -78,15 +78,11 @@ public class MasterGUI {
                 if (whoClicked instanceof Player p) {
                     p.closeInventory();
                     ModifyTutorialGUI gui = new ModifyTutorialGUI(
-                            3,
+                            1,
                             ChatUtil.format("&6Modify " + tutorialItem.getItem().getItemMeta().getDisplayName()),
                             MemoryUtil.getCreatedTutorials().get(tutorialItem.getItem().getItemMeta().getCustomModelData()));
 
-                    guiMap.put(this.getGuiID(), gui.getGui());
-                    MemoryUtil.getActiveInventories().put(p.getUniqueId(), guiMap);
-                    if (MemoryUtil.getActiveInventories().get(p.getUniqueId()) != null) {
-                        MemoryUtil.getActiveInventories().get(p.getUniqueId()).get(this.getGuiID()).show(p);
-                    }
+                    gui.getGui().show(p);
                 }
             });
         }
@@ -108,10 +104,7 @@ public class MasterGUI {
             if (whoClicked instanceof Player p) {
                 p.closeInventory();
                 CreateTutorialGUI gui = new CreateTutorialGUI();
-                MemoryUtil.getActiveInventories().put(p.getUniqueId(), gui.getGui());
-                if (MemoryUtil.getActiveInventories().get(p.getUniqueId()) != null) {
-                    MemoryUtil.getActiveInventories().get(p.getUniqueId()).show(p);
-                }
+                gui.getGui().show(p);
             }
         });
     }

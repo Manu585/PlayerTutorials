@@ -4,7 +4,6 @@ import lombok.Getter;
 import org.bendersdestiny.playertutorials.gui.MasterGUI;
 import org.bendersdestiny.playertutorials.gui.tutorial.CreateTutorialGUI;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
-import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,17 +27,13 @@ public class TutorialCommand implements CommandExecutor, TabCompleter {
                 if (label.equalsIgnoreCase("tutorial")) {
                     if (args.length == 0) {
                         MasterGUI gui = new MasterGUI();
-                        MemoryUtil.getActiveInventories().put(player.getUniqueId(), gui.getGui());
-                        if (MemoryUtil.getActiveInventories().get(player.getUniqueId()) != null) {
-                            MemoryUtil.getActiveInventories().get(player.getUniqueId()).show(player);
-                        }
+                        gui.getGui().show(player);
                         return true;
                     }
                     if (args.length == 1) {
                         String arg = args[0];
                         if (arg.equalsIgnoreCase("create")) {
                             CreateTutorialGUI gui = new CreateTutorialGUI();
-                            MemoryUtil.getActiveInventories().put(player.getUniqueId(), gui.getGui());
                             gui.getGui().show(player);
                             return true;
                         }

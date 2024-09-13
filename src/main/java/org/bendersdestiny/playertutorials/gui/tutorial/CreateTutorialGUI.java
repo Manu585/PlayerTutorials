@@ -142,7 +142,7 @@ public class CreateTutorialGUI {
 
         return new GuiItem(saveItemStack, event -> {
             if (this.tutorialTitle != null && this.tutorialIcon != null) {
-                Tutorial newTutorial = new Tutorial(GeneralMethods.createTutorialsID(PlayerTutorials.getInstance().getStorage()), this.tutorialTitle, this.tutorialIcon);
+                Tutorial newTutorial = new Tutorial(GeneralMethods.createRandomID(PlayerTutorials.getInstance().getStorage()), this.tutorialTitle, this.tutorialIcon);
                 MemoryUtil.getCreatedTutorials().put(newTutorial.getId(), newTutorial);
 
                 gui.getViewers().forEach(p -> p.sendMessage("Successfully created a new tutorial with the name " + this.tutorialTitle + " and the ID " + newTutorial.getId()));

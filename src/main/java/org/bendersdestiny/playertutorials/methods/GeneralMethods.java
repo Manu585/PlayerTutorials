@@ -101,7 +101,7 @@ public class GeneralMethods {
 	 * @param storage Storage instance
 	 * @return The ID for the tutorials table
 	 */
-	public static int createTutorialsID(Storage storage) {
+	public static int createRandomID(Storage storage) {
 		if (storage == null) {
 			throw new NullPointerException("Storage has not been initiated yet!");
 		}
@@ -132,6 +132,36 @@ public class GeneralMethods {
 		throw new NullPointerException("Failed to create tutorials ID");
 	}
 
+	public static int createRandomAreaID(Storage storage) {
+		if (storage == null) {
+			throw new NullPointerException("Storage has not been initiated yet!");
+		}
+
+		String query = "SELECT areaID FROM areas";
+		int id = 1;
+		Set<Integer> existingIds = new HashSet<>();
+
+		try (Connection connection = storage.getConnection();
+			 Statement statement = connection.createStatement();
+			 ResultSet resultSet = statement.executeQuery(query)) {
+
+			// Collect all existing IDs in the tutorials table
+			while (resultSet.next()) {
+				existingIds.add(resultSet.getInt("id"));
+			}
+
+			// Increment id until a non-existing one is found
+			while (existingIds.contains(id)) {
+				id++;
+			}
+
+			return id;
+
+		} catch (SQLException e) {
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't create random tutorial ID", e);
+		}
+		throw new NullPointerException("Failed to create tutorials ID");
+	}
 
 	/**
 	 * Join the {@link org.bendersdestiny.playertutorials.tutorial.area.Area} Selection mode so players can

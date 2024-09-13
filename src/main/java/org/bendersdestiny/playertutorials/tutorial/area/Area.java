@@ -18,6 +18,7 @@ import java.util.logging.Level;
 @Getter
 public class Area {
 	private final int areaID;
+	@Getter
 	private int tutorialID;
 
 	@Setter
@@ -33,7 +34,7 @@ public class Area {
 
 	public static final String areaColor = "&#82c238";
 
-	public Area(int areaID, int tutorialID, Structure structure, String name, Location spawnPoint, List<Task> tasks, int priority) {
+	public Area(int areaID, int tutorialID, Structure structure, String name, Location spawnPoint, @Nullable List<Task> tasks, int priority) {
 		this.areaID = areaID;
 		this.tutorialID = tutorialID;
 		this.structure = structure;
