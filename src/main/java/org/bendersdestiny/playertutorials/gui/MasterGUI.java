@@ -34,9 +34,9 @@ public class MasterGUI {
 
     private final int guiID = 0;
 
-    private final List<GuiItem> tutorialItems = new ArrayList<>();
+    private final int maxTutorialsPerPage = 26;
 
-    private final int maxTutorialsPerPage = 24;
+    private final List<GuiItem> tutorialItems = new ArrayList<>();
 
     private final Map<Integer, Gui> guiMap = new ConcurrentHashMap<>();
 
@@ -47,12 +47,13 @@ public class MasterGUI {
 
         this.fillTutorialItemList();
         this.setupUI();
-        this.gui.setOnGlobalClick(e -> e.setCancelled(true));
     }
 
     private void setupUI() {
         this.gui.addPane(this.pane);
         this.pane.setVisible(true);
+
+        this.gui.setOnGlobalClick(e -> e.setCancelled(true));
 
         // Add all tutorials to the gui
         int counter = 0;
@@ -63,11 +64,6 @@ public class MasterGUI {
 
         // Fill whole inventory with glass panes
         this.pane.fillWith(ItemUtil.getFillerItem());
-
-        // Remove bad looking Glass Pane
-        for (int i = 27; i <= 35; i++) {
-            this.pane.removeItem(Slot.fromIndex(i));
-        }
 
         // Open the ModifyTutorialGUI in case of tutorial item clicked
         for (GuiItem tutorialItem : this.tutorialItems) {
@@ -86,6 +82,12 @@ public class MasterGUI {
                 }
             });
         }
+
+        // Remove bad looking Glass Pane
+        for (int i = 0; i <= 8; i++) {
+            this.pane.removeItem(Slot.fromXY(i, 3));
+        }
+
         this.pane.addItem(getCreateTutorialItem(), Slot.fromIndex(31));
     }
 
@@ -116,7 +118,7 @@ public class MasterGUI {
 
             if (tutorialItemMeta == null) throw new NullPointerException("ItemMeta cannot be null");
 
-            tutorialItemMeta.setDisplayName(tutorial.getName());
+            tutorialItemMeta.setDisplayName(ChatUtil.format(tutorial.getName()));
             tutorialItemMeta.setCustomModelData(tutorial.getId());
             tutorialItemStack.setItemMeta(tutorialItemMeta);
 

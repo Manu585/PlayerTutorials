@@ -145,7 +145,7 @@ public class CreateTutorialGUI {
                 Tutorial newTutorial = new Tutorial(GeneralMethods.createRandomID(PlayerTutorials.getInstance().getStorage()), this.tutorialTitle, this.tutorialIcon);
                 MemoryUtil.getCreatedTutorials().put(newTutorial.getId(), newTutorial);
 
-                gui.getViewers().forEach(p -> p.sendMessage("Successfully created a new tutorial with the name " + this.tutorialTitle + " and the ID " + newTutorial.getId()));
+                gui.getViewers().forEach(p -> p.sendMessage(ChatUtil.format("&7Successfully created a new &6tutorial &7with the &6name " + this.tutorialTitle + " &7and the ID &6" + newTutorial.getId())));
 
                 MemoryUtil.saveTutorial(newTutorial);
 
@@ -155,6 +155,11 @@ public class CreateTutorialGUI {
                 this.tutorialIcon = Material.DIORITE;
 
                 this.gui.update();
+
+                event.getWhoClicked().closeInventory();
+
+                ModifyTutorialGUI gui = new ModifyTutorialGUI(1, ChatUtil.format("&6Modify " + newTutorial.getName()), newTutorial);
+                gui.getGui().show(event.getWhoClicked() instanceof Player p ? p : event.getWhoClicked());
             }
         });
     }

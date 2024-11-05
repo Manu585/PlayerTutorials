@@ -66,8 +66,7 @@ public class ModifyTutorialGUI {
 
         return new GuiItem(item, event -> {
             HumanEntity humanEntity = event.getWhoClicked();
-            if (humanEntity instanceof Player p) {
-            }
+            if (humanEntity instanceof Player p) {}
         });
     }
 
@@ -83,7 +82,9 @@ public class ModifyTutorialGUI {
         return new GuiItem(item, event -> {
             HumanEntity humanEntity = event.getWhoClicked();
             if (humanEntity instanceof Player p) {
-
+                if (this.tutorial != null) {
+                    MemoryUtil.deleteTutorial(this.tutorial);
+                }
             }
         });
     }

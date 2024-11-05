@@ -14,6 +14,7 @@ import org.bendersdestiny.playertutorials.tutorial.task.tasks.TeleportTask;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.sql.Connection;
@@ -106,7 +107,7 @@ public class MemoryUtil {
         }
     }
 
-    public static void saveArea(Area area) {
+    public static void saveArea(@NotNull Area area) {
         long startTime = System.currentTimeMillis();
         PlayerTutorials.getInstance().getLogger().log(Level.INFO, ChatUtil.format("&7Saving " + Area.areaColor + "Area &7..."));
         String query = "INSERT INTO areas VALUES(?,?,?,?,?,?,?)";
@@ -365,6 +366,18 @@ public class MemoryUtil {
     public static void finishTutorials() {
         for (Area area : createdAreas.values()) {
             createdTutorials.get(area.getTutorialID()).addArea(area);
+        }
+    }
+
+    public static void deleteTutorial(Tutorial tutorial) {
+        String delTutorials = "DELETE FROM tutorials WHERE id = ?";
+
+        try (Connection connection = storage.getConnection();
+             PreparedStatement delTutorialsStatement = connection.prepareStatement(delTutorials)) {
+            delTutorialsStatement.setInt(1, tutorial.getId());
+            delTutorialsStatement.executeUpdate();
+        } catch (SQLException e) {
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Couldn't delete Tutorial!", e);
         }
     }
 }
