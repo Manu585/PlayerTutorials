@@ -2,6 +2,7 @@ package org.bendersdestiny.playertutorials.tutorial.task;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
 import org.bendersdestiny.playertutorials.tutorial.area.Area;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPlayer;
@@ -14,13 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 public abstract class Task {
 	protected final String taskType;
 
-	private final int taskID;
-	private final int areaID;
-
-	@Setter
+	private int taskID;
+	private int areaID;
 	private int priority;
 
 	public static final String taskColor = "#ed28b2";
@@ -47,38 +47,38 @@ public abstract class Task {
 	 */
 	public ItemStack getTaskItemStack() {
 		switch (this.taskType) {
-			case "CommandTask":
-				ItemStack commandTaskItem = new ItemStack(Material.COMMAND_BLOCK);
-				ItemMeta commantTaskItemMeta = commandTaskItem.getItemMeta();
+			case "CommandTask" -> {
+				ItemStack cmdBlock = new ItemStack(Material.COMMAND_BLOCK);
+				ItemMeta meta = cmdBlock.getItemMeta();
+				if (meta == null) throw new NullPointerException("ItemMeta cannot be NULL!");
 
-				if (commantTaskItemMeta == null) throw new NullPointerException("ItemMeta cannot be NULL!");
+				meta.displayName(Component.text(ChatUtil.format("&6CommandTask")));
 
-				commantTaskItemMeta.setDisplayName(ChatUtil.format("&6CommandTask"));
-				List<String> commandTaskLore = new ArrayList<>();
-				commandTaskLore.add(ChatUtil.format(""));
-				commandTaskLore.add(ChatUtil.format("Priority: " + getPriority()));
-				commantTaskItemMeta.setLore(commandTaskLore);
+				List<Component> lore = new ArrayList<>();
+				lore.add(Component.text(ChatUtil.format("Priority: " + this.getPriority())));
+				meta.lore(lore);
+				meta.setCustomModelData(this.getTaskID());
+				cmdBlock.setItemMeta(meta);
 
-				commantTaskItemMeta.setCustomModelData(getTaskID());
+				return cmdBlock;
+			}
+			case "TeleportTask" -> {
+				ItemStack pearl = new ItemStack(Material.ENDER_PEARL);
+				ItemMeta pearlMeta = pearl.getItemMeta();
+				if (pearlMeta == null) throw new NullPointerException("ItemMeta cannot be NULL!");
 
-				return commandTaskItem;
-			case "TeleportTask":
-				ItemStack teleportTaskItem = new ItemStack(Material.ENDER_PEARL);
-				ItemMeta teleportTaskItemItemMeta = teleportTaskItem.getItemMeta();
+				pearlMeta.displayName(Component.text(ChatUtil.format("&dTeleportTask")));
 
-				if (teleportTaskItemItemMeta == null) throw new NullPointerException("ItemMeta cannot be NULL!");
+				List<Component> lore = new ArrayList<>();
+				lore.add(Component.text(ChatUtil.format("Priority: " + this.getPriority())));
+				pearlMeta.lore(lore);
+				pearlMeta.setCustomModelData(this.getTaskID());
+				pearl.setItemMeta(pearlMeta);
 
-				teleportTaskItemItemMeta.setDisplayName(ChatUtil.format("&dTeleportTask"));
-				List<String> teleportTaskLore = new ArrayList<>();
-				teleportTaskLore.add(ChatUtil.format(""));
-				teleportTaskLore.add(ChatUtil.format("Priority: " + getPriority()));
-				teleportTaskItemItemMeta.setLore(teleportTaskLore);
-
-				teleportTaskItemItemMeta.setCustomModelData(getTaskID());
-
-				return teleportTaskItem;
-			default:
-				throw new IllegalArgumentException("Invalid task type: " + this.taskType);
-        }
-    }
+				return pearl;
+			}
+			default ->
+					throw new IllegalArgumentException("Invalid task type: " + this.taskType);
+		}
+	}
 }

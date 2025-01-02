@@ -1,5 +1,8 @@
 package org.bendersdestiny.playertutorials;
 
+import dev.rollczi.litecommands.LiteCommands;
+import dev.rollczi.litecommands.bukkit.LiteBukkitFactory;
+import dev.rollczi.litecommands.bukkit.LiteBukkitMessages;
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.commands.TutorialCommand;
 import org.bendersdestiny.playertutorials.configuration.ConfigManager;
@@ -9,11 +12,10 @@ import org.bendersdestiny.playertutorials.manager.StorageManager;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.Objects;
 
 public final class PlayerTutorials extends JavaPlugin {
 	@Getter
@@ -24,34 +26,57 @@ public final class PlayerTutorials extends JavaPlugin {
 	private ItemManager itemManager;
 	private ChatUtil chatUtil;
 
+	@Getter
+	private LiteCommands<CommandSender> liteCommands;
+
 	@Override
 	public void onEnable() {
 		instance = this;
-		chatUtil = new ChatUtil(this);
+		this.chatUtil = new ChatUtil(this);
 
-		this.registerCommands();
+
+		// --------------------------------------------Command Builder--------------------------------------------
+		this.liteCommands = LiteBukkitFactory.builder("PlayerTutorials", this)
+				.settings(settings -> settings.nativePermissions(false))
+
+				.commands(
+						new TutorialCommand()
+				)
+
+				.message(LiteBukkitMessages.PLAYER_ONLY, "&cOnly a player can execute this command!")
+				.build();
+		// -------------------------------------------------------------------------------------------------------
+
+
+		// Listeners
 		this.registerListeners(
 				new TutorialListener()
 		);
 
 		new ConfigManager(this);
-		storage = new Storage(); // Setup storage after config is initialized!!
-
-		itemManager = new ItemManager();
+		this.storage = new Storage(); // Setup storage after config is initialized for Databasetype retrival!
+		this.itemManager = new ItemManager();
 
 		this.loadEverythingAsync();
 
-		chatUtil.sendServerStartupMessage();
+		this.chatUtil.sendServerStartupMessage();
 	}
 
 	@Override
 	public void onDisable() {
-		// Close database connections cleanly
-		if (storage != null) {
-			storage.disconnect();
+		MemoryUtil.saveTutorials();
+		MemoryUtil.saveAreas();
+		MemoryUtil.saveTasks();
+		MemoryUtil.saveStructures();
+
+		if (this.storage != null) {
+			this.storage.disconnect();
 		}
-		if (chatUtil != null) {
-			chatUtil.sendServerStopMessage();
+		if (this.chatUtil != null) {
+			this.chatUtil.sendServerStopMessage();
+		}
+		if (this.liteCommands != null) {
+			this.liteCommands.unregister();
 		}
 	}
 
@@ -59,11 +84,6 @@ public final class PlayerTutorials extends JavaPlugin {
 		for (Listener listener : listeners) {
 			getServer().getPluginManager().registerEvents(listener, this);
 		}
-	}
-
-	private void registerCommands() {
-		Objects.requireNonNull(getCommand("tutorial")).setExecutor(new TutorialCommand());
-		Objects.requireNonNull(getCommand("tutorial")).setTabCompleter(new TutorialCommand());
 	}
 
 	private void loadEverythingAsync() {
@@ -75,8 +95,8 @@ public final class PlayerTutorials extends JavaPlugin {
 				StorageManager.loadAllTasksAsync();
 				StorageManager.loadAllStructuresAsync();
 
-				// Adds all loaded areas to the coresponding tutorials
-				MemoryUtil.finishTutorials();
+				// Attach areas to tutorials in memory
+				MemoryUtil.addAreasToTutorials();
 			}
 		}.runTaskAsynchronously(instance);
 	}

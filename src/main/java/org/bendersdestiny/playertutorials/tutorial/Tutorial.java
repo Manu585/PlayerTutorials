@@ -12,13 +12,11 @@ import java.util.List;
 import java.util.logging.Level;
 
 @Getter
+@Setter
 public class Tutorial {
-	private final int id;
-	@Setter
+	private int id;
 	private String name;
-	@Setter
 	private Material icon;
-	@Setter
 	private List<Area> areas;
 
 	public static final String tutorialColor = "&#F2B152";
@@ -26,23 +24,19 @@ public class Tutorial {
 	/**
 	 * Freshly created {@link Tutorial} constructor
 	 *
-	 * @param id ID of the tutorial
-	 * @param name Name of the tutorial
-	 * @param icon The icon display in the GUI
+	 * @param id    ID of the tutorial
+	 * @param name  Name of the tutorial
+	 * @param icon  The icon display in the GUI
 	 */
 	public Tutorial(int id, String name, @Nullable Material icon) {
 		this.id = id;
 		this.name = name;
-		if (icon == null) {
-			this.icon = Material.DIORITE;
-		} else {
-			this.icon = icon;
-		}
+		this.icon = (icon == null) ? Material.DIORITE : icon;
 		this.areas = new ArrayList<>();
 	}
 
 	/**
-	 * Existing {@link Tutorial} coming from the database constructor
+	 * Existing {@link Tutorial} from the database constructor
 	 *
 	 * @param id ID of the tutorial
 	 * @param name Name of the tutorial
@@ -64,7 +58,8 @@ public class Tutorial {
 		if (this.areas != null && area != null) {
 			this.areas.add(area);
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"An Error occurred while adding a new area!");
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
+					"Error while adding a new area to tutorial!");
 		}
 	}
 
@@ -77,7 +72,8 @@ public class Tutorial {
 		if (this.areas != null && area != null) {
 			this.areas.remove(area);
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"An Error occurred while removing an area!");
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
+					"Error while removing an area from tutorial!");
 		}
 	}
 }

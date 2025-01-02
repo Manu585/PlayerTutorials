@@ -16,20 +16,14 @@ import java.util.List;
 import java.util.logging.Level;
 
 @Getter
+@Setter
 public class Area {
-	private final int areaID;
-	@Getter
+	private int areaID;
 	private int tutorialID;
-
-	@Setter
 	private Structure structure;
-	@Setter
 	private String name;
-	@Setter
 	private Location spawnPoint;
-	@Setter
 	private List<Task> tasks;
-	@Setter
 	private int priority;
 
 	public static final String areaColor = "&#82c238";
@@ -59,7 +53,7 @@ public class Area {
 	 */
 	public Area(int areaID, Structure structure, String name, Location spawnPoint, @Nullable List<Task> tasks, int priority) {
 		this.areaID = areaID;
-        this.structure = structure;
+		this.structure = structure;
 		this.name = name;
 		this.spawnPoint = spawnPoint;
 		this.tasks = tasks;
@@ -72,20 +66,19 @@ public class Area {
 	 * @param task Task to add
 	 */
 	public void addTask(Task task) {
-		if (this.tasks != null) {
+		if (this.tasks != null && task != null) {
 			this.tasks.add(task);
-			MemoryUtil.createdTasks.put(task.getTaskID(), task);
+			MemoryUtil.getCreatedTasks().put(task.getTaskID(), task);
 			switch (task.getTaskType()) {
-				case "CommandTask":
-					MemoryUtil.createdCommandTasks.put(task.getTaskID(), (CommandTask) task);
-					break;
-				case "TeleportTask":
-					MemoryUtil.createdTeleportTasks.put(task.getTaskID(), (TeleportTask) task);
-					break;
+				case "CommandTask" ->
+						MemoryUtil.getCreatedCommandTasks().put(task.getTaskID(), (CommandTask) task);
+				case "TeleportTask" ->
+						MemoryUtil.getCreatedTeleportTasks().put(task.getTaskID(), (TeleportTask) task);
+				default -> {}
 			}
-			MemoryUtil.createdTasks.put(task.getTaskID(), task);
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while adding a new task!");
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
+					"Error while adding a new task to area!");
 		}
 	}
 
@@ -95,19 +88,19 @@ public class Area {
 	 * @param task Task to remove
 	 */
 	public void removeTask(Task task) {
-		if (this.tasks != null) {
-			this.tasks.remove(task.getPriority());
-			MemoryUtil.createdTasks.remove(task.getTaskID());
+		if (this.tasks != null && task != null) {
+			this.tasks.remove(task);
+			MemoryUtil.getCreatedTasks().remove(task.getTaskID());
 			switch (task.getTaskType()) {
-				case "CommandTask":
-					MemoryUtil.createdCommandTasks.remove(task.getTaskID());
-					break;
-				case "TeleportTask":
-					MemoryUtil.createdTeleportTasks.remove(task.getTaskID());
-					break;
+				case "CommandTask" ->
+						MemoryUtil.getCreatedCommandTasks().remove(task.getTaskID());
+				case "TeleportTask" ->
+						MemoryUtil.getCreatedTeleportTasks().remove(task.getTaskID());
+				default -> {}
 			}
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while removing a task!");
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
+					"Error while removing a task from area!");
 		}
 	}
 }

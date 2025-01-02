@@ -1,56 +1,32 @@
 package org.bendersdestiny.playertutorials.commands;
 
+import dev.rollczi.litecommands.annotations.context.Context;
+import dev.rollczi.litecommands.annotations.execute.Execute;
+import dev.rollczi.litecommands.annotations.permission.Permission;
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.gui.MasterGUI;
 import org.bendersdestiny.playertutorials.gui.tutorial.CreateTutorialGUI;
-import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bendersdestiny.playertutorials.methods.GeneralMethods;
+import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPlayer;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
-public class TutorialCommand implements CommandExecutor, TabCompleter {
+@dev.rollczi.litecommands.annotations.command.Command(name = "tutorial", aliases = "t")
+@Permission("playertutorials.tutorial")
+public class TutorialCommand {
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatUtil.format("&cOnly a player can run this command!"));
-        } else {
-            if (player.hasPermission("playertutorials.tutorial.create")) {
-                if (label.equalsIgnoreCase("tutorial")) {
-                    if (args.length == 0) {
-                        MasterGUI gui = new MasterGUI();
-                        gui.getGui().show(player);
-                        return true;
-                    }
-                    if (args.length == 1) {
-                        String arg = args[0];
-                        if (arg.equalsIgnoreCase("create")) {
-                            CreateTutorialGUI gui = new CreateTutorialGUI();
-                            gui.getGui().show(player);
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+    @Execute
+    void mainCommand(@Context Player sender) {
+        new MasterGUI().getGui().show(sender);
     }
 
-    @Nullable
-    @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        ArrayList<String> arg = new ArrayList<>();
-        if (args.length == 1) {
-            arg.add("create");
-        }
-        return arg;
+    @Execute(name = "create", aliases = "c")
+    void createCommand(@Context Player sender) {
+        new CreateTutorialGUI().getGui().show(sender);
+    }
+
+    @Execute(name = "selection")
+    void selectionToolCommand(@Context Player sender) {
+        GeneralMethods.joinAreaSelectionMode(TutorialPlayer.getPlayer(sender.getUniqueId()));
     }
 }

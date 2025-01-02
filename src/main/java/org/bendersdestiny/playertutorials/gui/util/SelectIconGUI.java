@@ -6,8 +6,9 @@ import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import org.bendersdestiny.playertutorials.gui.tutorial.CreateTutorialGUI;
-import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -35,6 +36,8 @@ public class SelectIconGUI {
 		this.paginatedPane = new PaginatedPane(9, 4);
 		this.paginatedPane.setVisible(true);
 		this.setupUI();
+
+		this.gui.setOnGlobalClick(click -> click.setCancelled(true));
 	}
 
 	void setupUI() {
@@ -55,7 +58,7 @@ public class SelectIconGUI {
 				HumanEntity whoClicked = event.getWhoClicked();
 				if (whoClicked instanceof Player p) {
 					p.closeInventory();
-					MemoryUtil.guiCache.put(0, clickedItem.getType().toString());
+					MemoryUtil.getGuiCache().put(0, clickedItem.getType().toString());
 					new CreateTutorialGUI().getGui().show(p);
 				}
 			}
@@ -71,17 +74,18 @@ public class SelectIconGUI {
 				continue;
 			}
 
-			currentPage.addItem(new GuiItem(new ItemStack(material)), Slot.fromIndex(currentIndex));
-			currentIndex++;
+			try {
+				currentPage.addItem(new GuiItem(new ItemStack(material)), Slot.fromIndex(currentIndex));
+				currentIndex++;
 
-			if (currentIndex >= maxIconsPerPage) {
-				addNavigationButtons(currentPage);
-				this.iconPages.add(currentPage);
+				if (currentIndex >= maxIconsPerPage) {
+					addNavigationButtons(currentPage);
+					this.iconPages.add(currentPage);
 
-				// Create a new page
-				currentPage = new StaticPane(9, 4);
-				currentIndex = 0;
-			}
+					currentPage = new StaticPane(9, 4);
+					currentIndex = 0;
+				}
+			} catch (IllegalArgumentException ignored) {}
 		}
 
 		// Add any remaining items on the last page
@@ -106,7 +110,8 @@ public class SelectIconGUI {
 
 		assert meta != null;
 
-		meta.setDisplayName(ChatUtil.format("&6Next page"));
+		meta.displayName(Component.text("Next page", TextColor.color(245, 182, 66)));
+
 		item.setItemMeta(meta);
 
 		return new GuiItem(item, event -> {
@@ -124,7 +129,8 @@ public class SelectIconGUI {
 
 		assert meta != null;
 
-		meta.setDisplayName(ChatUtil.format("&6Previous page"));
+		meta.displayName(Component.text("Previous page", TextColor.color(245, 182, 66)));
+
 		item.setItemMeta(meta);
 
 		return new GuiItem(item, event -> {

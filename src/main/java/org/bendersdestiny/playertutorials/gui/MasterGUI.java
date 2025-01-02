@@ -7,6 +7,9 @@ import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.gui.tutorial.CreateTutorialGUI;
 import org.bendersdestiny.playertutorials.gui.tutorial.ModifyTutorialGUI;
@@ -32,8 +35,6 @@ public class MasterGUI {
     private final ChestGui gui;
     private final StaticPane pane;
 
-    private final int guiID = 0;
-
     private final int maxTutorialsPerPage = 26;
 
     private final List<GuiItem> tutorialItems = new ArrayList<>();
@@ -42,7 +43,10 @@ public class MasterGUI {
 
 
     public MasterGUI() {
-        this.gui = new ChestGui(4, ChatUtil.format("&6Tutorials"), PlayerTutorials.getInstance());
+        Component titleComp = Component.text("Tutorials", TextColor.color(74, 185, 210));
+        String legacyTitle = LegacyComponentSerializer.legacySection().serialize(titleComp);
+
+        this.gui = new ChestGui(4, legacyTitle, PlayerTutorials.getInstance());
         this.pane = new StaticPane(0, 0, 9, 4, Pane.Priority.HIGH);
 
         this.fillTutorialItemList();
@@ -73,19 +77,15 @@ public class MasterGUI {
                 HumanEntity whoClicked = e.getWhoClicked();
                 if (whoClicked instanceof Player p) {
                     p.closeInventory();
+                    Tutorial tutorial = MemoryUtil.getCreatedTutorials().get(tutorialItem.getItem().getItemMeta().getCustomModelData());
                     ModifyTutorialGUI gui = new ModifyTutorialGUI(
                             1,
-                            ChatUtil.format("&6Modify " + tutorialItem.getItem().getItemMeta().getDisplayName()),
-                            MemoryUtil.getCreatedTutorials().get(tutorialItem.getItem().getItemMeta().getCustomModelData()));
+                            ChatUtil.format("&#4a6ad2Modify " + tutorial.getName()),
+                            tutorial);
 
                     gui.getGui().show(p);
                 }
             });
-        }
-
-        // Remove bad looking Glass Pane
-        for (int i = 0; i <= 8; i++) {
-            this.pane.removeItem(Slot.fromXY(i, 3));
         }
 
         this.pane.addItem(getCreateTutorialItem(), Slot.fromIndex(31));
@@ -98,7 +98,8 @@ public class MasterGUI {
 
         if (itemMeta == null) throw new NullPointerException("ItemMeta cannot be null");
 
-        itemMeta.setDisplayName(ChatUtil.format("&aCreate Tutorial"));
+        itemMeta.displayName(Component.text("Create Tutorial", TextColor.color(84, 199, 46)));
+
         createTutorialItem.setItemMeta(itemMeta);
 
         return new GuiItem(createTutorialItem, event -> {
@@ -118,8 +119,9 @@ public class MasterGUI {
 
             if (tutorialItemMeta == null) throw new NullPointerException("ItemMeta cannot be null");
 
-            tutorialItemMeta.setDisplayName(ChatUtil.format(tutorial.getName()));
+            tutorialItemMeta.displayName(Component.text(tutorial.getName()));
             tutorialItemMeta.setCustomModelData(tutorial.getId());
+
             tutorialItemStack.setItemMeta(tutorialItemMeta);
 
             this.tutorialItems.add(new GuiItem(tutorialItemStack));

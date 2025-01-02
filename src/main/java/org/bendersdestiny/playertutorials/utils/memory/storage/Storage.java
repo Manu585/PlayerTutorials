@@ -34,6 +34,7 @@ public class Storage {
 			this.storageType = "sqlite";
 			this.setupSQLiteStorage();
 		}
+
 		this.createAllTables();
 	}
 
@@ -84,122 +85,196 @@ public class Storage {
 		this.createTasksTable();
 		this.createCommandTaskTable();
 		this.createTeleportTaskTable();
+		this.createAreaTasksTable();
+	}
+
+	/**
+	 * Returns the proper auto-increment syntax depending on the DB type.
+	 */
+	private String getPrimaryKeyAutoIncrement() {
+		if (this.storageType.equalsIgnoreCase("sqlite")) {
+			return "INTEGER PRIMARY KEY AUTOINCREMENT";
+		} else {
+			// MySQL
+			return "INT AUTO_INCREMENT PRIMARY KEY";
+		}
 	}
 
 	/**
 	 * Creates the tutorial table for all created tutorials
 	 */
 	public void createTutorialTable() {
-		String query =
+		String sqlite =
 				"CREATE TABLE IF NOT EXISTS tutorials (" +
-						"id INTEGER PRIMARY KEY," +
-						"name VARCHAR(255) NOT NULL," +
-						"icon VARCHAR(41) DEFAULT 'DIORITE'" +
+						"  id INTEGER PRIMARY KEY AUTOINCREMENT," +
+						"  name VARCHAR(255) NOT NULL," +
+						"  icon VARCHAR(41) DEFAULT 'DIORITE'" +
 						")";
-		try (Connection connection = this.getConnection();
-			 Statement statement = connection.createStatement()) {
-			statement.execute(query);
-		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create tutorials table!", e);
-		}
+		String mysql =
+				"CREATE TABLE IF NOT EXISTS tutorials (" +
+						"  id INT AUTO_INCREMENT PRIMARY KEY," +
+						"  name VARCHAR(255) NOT NULL," +
+						"  icon VARCHAR(41) DEFAULT 'DIORITE'" +
+						") ENGINE=InnoDB";
+
+		runStatement(this.storageType.equalsIgnoreCase("sqlite") ? sqlite : mysql,
+				"Failed to create tutorials table!");
 	}
 
 	/**
 	 * Creates the area table for all created tutorial areas
 	 */
 	public void createAreaTable() {
-		String query =
+		String sqlite =
 				"CREATE TABLE IF NOT EXISTS areas (" +
-						"areaID INTEGER PRIMARY KEY," +
-						"tutorialID INTEGER," +
-						"structureID INTEGER," +
-						"name VARCHAR(255)," +
-						"spawnPoint TEXT," +
-						"tasks TEXT," +
-						"priority INTEGER," +
-						"FOREIGN KEY(tutorialID) REFERENCES tutorials(id) ON DELETE CASCADE" +
+						"  areaID INTEGER PRIMARY KEY AUTOINCREMENT," +
+						"  tutorialID INTEGER," +
+						"  structureID INTEGER," +
+						"  name VARCHAR(255)," +
+						"  spawnPoint TEXT," +
+						"  priority INTEGER," +
+						"  FOREIGN KEY(tutorialID) REFERENCES tutorials(id) ON DELETE CASCADE" +
 						")";
-		try (Connection connection = this.getConnection();
-			 Statement statement = connection.createStatement()) {
-			statement.execute(query);
-		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create areas table!", e);
-		}
+
+		String mysql =
+				"CREATE TABLE IF NOT EXISTS areas (" +
+						"  areaID INT AUTO_INCREMENT PRIMARY KEY," +
+						"  tutorialID INT," +
+						"  structureID INT," +
+						"  name VARCHAR(255)," +
+						"  spawnPoint TEXT," +
+						"  priority INT," +
+						"  FOREIGN KEY(tutorialID) REFERENCES tutorials(id) ON DELETE CASCADE" +
+						") ENGINE=InnoDB";
+
+		runStatement(this.storageType.equalsIgnoreCase("sqlite") ? sqlite : mysql,
+				"Failed to create areas table!");
 	}
 
 	/**
 	 * Creates the structure table
 	 */
 	public void createStructuresTable() {
-		String query =
+		String sqlite =
 				"CREATE TABLE IF NOT EXISTS structures (" +
-						"structureID INTEGER PRIMARY KEY," +
-						"areaID INTEGER," +
-						"schematic TEXT," +
-						"FOREIGN KEY(areaID) REFERENCES areas(areaID) ON DELETE CASCADE" +
+						"  structureID INTEGER PRIMARY KEY AUTOINCREMENT," +
+						"  areaID INTEGER," +
+						"  schematic TEXT," +
+						"  FOREIGN KEY(areaID) REFERENCES areas(areaID) ON DELETE CASCADE" +
 						")";
-		try (Connection connection = this.getConnection();
-			 Statement statement = connection.createStatement()) {
-			statement.execute(query);
-		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create structures table!", e);
-		}
+		String mysql =
+				"CREATE TABLE IF NOT EXISTS structures (" +
+						"  structureID INT AUTO_INCREMENT PRIMARY KEY," +
+						"  areaID INT," +
+						"  schematic TEXT," +
+						"  FOREIGN KEY(areaID) REFERENCES areas(areaID) ON DELETE CASCADE" +
+						") ENGINE=InnoDB";
+
+		runStatement(this.storageType.equalsIgnoreCase("sqlite") ? sqlite : mysql,
+				"Failed to create structures table!");
 	}
 
 	/**
 	 * Creates the tasks table
 	 */
 	public void createTasksTable() {
-		String query =
+		String sqlite =
 				"CREATE TABLE IF NOT EXISTS tasks (" +
-						"taskID INTEGER PRIMARY KEY," +
-						"areaID INTEGER NOT NULL," +
-						"type VARCHAR(50)," + // 'CommandTask' or 'TeleportTask' or ...
-						"priority INTEGER NOT NULL," +
-						"FOREIGN KEY(areaID) REFERENCES areas(areaID) ON DELETE CASCADE" +
+						"  taskID INTEGER PRIMARY KEY AUTOINCREMENT," +
+						"  areaID INTEGER NOT NULL," +
+						"  type VARCHAR(50)," +
+						"  priority INTEGER NOT NULL," +
+						"  FOREIGN KEY(areaID) REFERENCES areas(areaID) ON DELETE CASCADE" +
 						")";
-		try (Connection connection = this.getConnection();
-			 Statement statement = connection.createStatement()) {
-			statement.execute(query);
-		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create tasks table!", e);
-		}
+		String mysql =
+				"CREATE TABLE IF NOT EXISTS tasks (" +
+						"  taskID INT AUTO_INCREMENT PRIMARY KEY," +
+						"  areaID INT NOT NULL," +
+						"  type VARCHAR(50)," +
+						"  priority INT NOT NULL," +
+						"  FOREIGN KEY(areaID) REFERENCES areas(areaID) ON DELETE CASCADE" +
+						") ENGINE=InnoDB";
+
+		runStatement(this.storageType.equalsIgnoreCase("sqlite") ? sqlite : mysql,
+				"Failed to create tasks table!");
 	}
 
 	/**
 	 * Creates the teleport tasks table
 	 */
-	public void createTeleportTaskTable() {
-		String query =
-				"CREATE TABLE IF NOT EXISTS teleport_tasks (" +
-						"taskID INTEGER PRIMARY KEY," +
-						"fromLocation TEXT," +
-						"toLocation TEXT," +
-						"FOREIGN KEY(taskID) REFERENCES tasks(taskID) ON DELETE CASCADE" +
+	public void createCommandTaskTable() {
+		String sqlite =
+				"CREATE TABLE IF NOT EXISTS command_tasks (" +
+						"  taskID INTEGER PRIMARY KEY," +
+						"  required_command TEXT," +
+						"  FOREIGN KEY(taskID) REFERENCES tasks(taskID) ON DELETE CASCADE" +
 						")";
-		try (Connection connection = this.getConnection();
-			 Statement statement = connection.createStatement()) {
-			statement.execute(query);
-		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create teleport tasks table!", e);
-		}
+		String mysql =
+				"CREATE TABLE IF NOT EXISTS command_tasks (" +
+						"  taskID INT PRIMARY KEY," +
+						"  required_command TEXT," +
+						"  FOREIGN KEY(taskID) REFERENCES tasks(taskID) ON DELETE CASCADE" +
+						") ENGINE=InnoDB";
+
+		runStatement(this.storageType.equalsIgnoreCase("sqlite") ? sqlite : mysql,
+				"Failed to create command tasks table!");
 	}
 
 	/**
 	 * Creates the command tasks table
 	 */
-	public void createCommandTaskTable() {
-		String query =
-				"CREATE TABLE IF NOT EXISTS command_tasks (" +
-						"taskID INTEGER PRIMARY KEY," +
-						"required_command TEXT," +
-						"FOREIGN KEY(taskID) REFERENCES tasks(taskID) ON DELETE CASCADE" +
+	public void createTeleportTaskTable() {
+		String sqlite =
+				"CREATE TABLE IF NOT EXISTS teleport_tasks (" +
+						"  taskID INTEGER PRIMARY KEY," +
+						"  fromLocation TEXT," +
+						"  toLocation TEXT," +
+						"  FOREIGN KEY(taskID) REFERENCES tasks(taskID) ON DELETE CASCADE" +
 						")";
+		String mysql =
+				"CREATE TABLE IF NOT EXISTS teleport_tasks (" +
+						"  taskID INT PRIMARY KEY," +
+						"  fromLocation TEXT," +
+						"  toLocation TEXT," +
+						"  FOREIGN KEY(taskID) REFERENCES tasks(taskID) ON DELETE CASCADE" +
+						") ENGINE=InnoDB";
+
+		runStatement(this.storageType.equalsIgnoreCase("sqlite") ? sqlite : mysql,
+				"Failed to create teleport tasks table!");
+	}
+
+	/**
+	 * Creates the area_tasks bridging table to link areas and tasks
+	 */
+	public void createAreaTasksTable() {
+		String sqlite =
+				"CREATE TABLE IF NOT EXISTS area_tasks (" +
+						"  areaID INTEGER NOT NULL," +
+						"  taskID INTEGER NOT NULL," +
+						"  PRIMARY KEY (areaID, taskID)," +
+						"  FOREIGN KEY(areaID) REFERENCES areas(areaID) ON DELETE CASCADE," +
+						"  FOREIGN KEY(taskID) REFERENCES tasks(taskID) ON DELETE CASCADE" +
+						")";
+		String mysql =
+				"CREATE TABLE IF NOT EXISTS area_tasks (" +
+						"  areaID INT NOT NULL," +
+						"  taskID INT NOT NULL," +
+						"  PRIMARY KEY (areaID, taskID)," +
+						"  FOREIGN KEY(areaID) REFERENCES areas(areaID) ON DELETE CASCADE," +
+						"  FOREIGN KEY(taskID) REFERENCES tasks(taskID) ON DELETE CASCADE" +
+						") ENGINE=InnoDB";
+
+		runStatement(this.storageType.equalsIgnoreCase("sqlite") ? sqlite : mysql,
+				"Failed to create area_tasks table!");
+	}
+
+	private void runStatement(String sql, String errorMessage) {
 		try (Connection connection = this.getConnection();
 			 Statement statement = connection.createStatement()) {
-			statement.execute(query);
+
+			statement.execute(sql);
 		} catch (SQLException e) {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Failed to create command tasks table!", e);
+			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, errorMessage, e);
 		}
 	}
 }
