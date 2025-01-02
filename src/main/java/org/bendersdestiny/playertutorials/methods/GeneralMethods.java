@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -99,8 +100,12 @@ public class GeneralMethods {
 
 		// SAVE ORIGINAL ITEMS
 		for (int i = 0; i < player.getInventory().getContents().length; i++) {
-			tutorialPlayer.getORIGINAL_ITEMS().put(i, player.getInventory().getContents()[i]);
+			ItemStack item = player.getInventory().getItem(i);
+			if (item != null) {
+				tutorialPlayer.getORIGINAL_ITEMS().put(i, item);
+			}
 		}
+
 		player.getInventory().clear();
 		player.getInventory().setItem(4,
 				PlayerTutorials.getInstance().getItemManager().getAreaSelector().item
@@ -108,7 +113,11 @@ public class GeneralMethods {
 		player.getInventory().setHeldItemSlot(4);
 
 		final Component mainTitle = Component.textOfChildren(
-				Component.text("Select the area with the", TextColor.color(130, 130, 130)),
+				Component.text("Select the", TextColor.color(130, 130, 130)),
+				Component.space(),
+				Component.text("area", TextColor.color(182, 61, 209)),
+				Component.space(),
+				Component.text("with the", TextColor.color(130, 130, 130)),
 				Component.space(),
 				Component.text("Axe", TextColor.color(240, 196, 53)));
 
@@ -125,6 +134,6 @@ public class GeneralMethods {
 		final Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(3000), Duration.ofMillis(500));
 		final Title title = Title.title(mainTitle, subTitle, times);
 
-		player.sendMessage(title.title());
+		player.showTitle(title);
 	}
 }

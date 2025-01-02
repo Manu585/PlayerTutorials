@@ -8,7 +8,6 @@ import org.bendersdestiny.playertutorials.commands.TutorialCommand;
 import org.bendersdestiny.playertutorials.configuration.ConfigManager;
 import org.bendersdestiny.playertutorials.listeners.TutorialListener;
 import org.bendersdestiny.playertutorials.manager.ItemManager;
-import org.bendersdestiny.playertutorials.manager.StorageManager;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
@@ -90,14 +89,21 @@ public final class PlayerTutorials extends JavaPlugin {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				StorageManager.loadAllTutorialsAsync();
-				StorageManager.loadAllAreasAsync();
-				StorageManager.loadAllTasksAsync();
-				StorageManager.loadAllStructuresAsync();
+				try {
+					MemoryUtil.loadTutorials();
+					MemoryUtil.loadAreas();
+					MemoryUtil.loadTasks();
+					MemoryUtil.loadStructures();
 
-				// Attach areas to tutorials in memory
-				MemoryUtil.addAreasToTutorials();
+					// Attach areas to tutorials in memory
+					MemoryUtil.addAreasToTutorials();
+
+				} catch (Exception e) {
+					PlayerTutorials.getInstance().getLogger().severe("Fatal error loading everything: " + e.getMessage());
+					e.printStackTrace();
+				}
 			}
-		}.runTaskAsynchronously(instance);
+		}.runTaskAsynchronously(this);
 	}
+
 }

@@ -37,6 +37,7 @@ public class ItemManager {
         areaSelector = new AreaSelector(
                 ChatUtil.format(config.getString(path + "areaselector.name")),
                 lore,
-                Material.valueOf(config.getString(path + "material", "WOODEN_AXE")));
+                Material.valueOf(config.getString(path + "material", "WOODEN_AXE"))
+        );
     }
 }

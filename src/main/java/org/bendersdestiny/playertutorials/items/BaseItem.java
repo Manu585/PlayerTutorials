@@ -25,7 +25,6 @@ public abstract class BaseItem {
 		this.item = new ItemStack(material);
 
 		this.createItem();
-
 		allItems.add(this);
 	}
 
