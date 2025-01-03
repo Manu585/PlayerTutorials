@@ -2,6 +2,7 @@ package org.bendersdestiny.playertutorials.items;
 
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,7 +36,7 @@ public abstract class BaseItem {
 	private void createItem() {
 		ItemMeta meta = this.item.getItemMeta();
 		if (meta != null) {
-			meta.displayName(Component.text(this.name));
+			meta.displayName(ChatUtil.translate(this.name));
 			meta.lore(this.lore);
 			this.item.setItemMeta(meta);
 		} else {

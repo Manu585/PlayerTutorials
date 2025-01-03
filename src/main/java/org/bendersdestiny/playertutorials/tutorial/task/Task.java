@@ -52,10 +52,10 @@ public abstract class Task {
 				ItemMeta meta = cmdBlock.getItemMeta();
 				if (meta == null) throw new NullPointerException("ItemMeta cannot be NULL!");
 
-				meta.displayName(Component.text(ChatUtil.format("&6CommandTask")));
+				meta.displayName(ChatUtil.translate("&6CommandTask"));
 
 				List<Component> lore = new ArrayList<>();
-				lore.add(Component.text(ChatUtil.format("Priority: " + this.getPriority())));
+				lore.add(ChatUtil.translate("Priority: " + this.getPriority()));
 				meta.lore(lore);
 				meta.setCustomModelData(this.getTaskID());
 				cmdBlock.setItemMeta(meta);
@@ -67,10 +67,10 @@ public abstract class Task {
 				ItemMeta pearlMeta = pearl.getItemMeta();
 				if (pearlMeta == null) throw new NullPointerException("ItemMeta cannot be NULL!");
 
-				pearlMeta.displayName(Component.text(ChatUtil.format("&dTeleportTask")));
+				pearlMeta.displayName(ChatUtil.translate("&dTeleportTask"));
 
 				List<Component> lore = new ArrayList<>();
-				lore.add(Component.text(ChatUtil.format("Priority: " + this.getPriority())));
+				lore.add(ChatUtil.translate("Priority: " + this.getPriority()));
 				pearlMeta.lore(lore);
 				pearlMeta.setCustomModelData(this.getTaskID());
 				pearl.setItemMeta(pearlMeta);

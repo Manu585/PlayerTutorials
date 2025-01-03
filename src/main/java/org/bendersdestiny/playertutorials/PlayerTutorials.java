@@ -35,7 +35,7 @@ public final class PlayerTutorials extends JavaPlugin {
 
 
 		// --------------------------------------------Command Builder--------------------------------------------
-		this.liteCommands = LiteBukkitFactory.builder("PlayerTutorials", this)
+		this.liteCommands = LiteBukkitFactory.builder("playertutorials", this)
 				.settings(settings -> settings.nativePermissions(false))
 
 				.commands(

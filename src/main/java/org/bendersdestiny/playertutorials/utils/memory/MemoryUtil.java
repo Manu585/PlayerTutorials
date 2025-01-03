@@ -3,6 +3,7 @@ package org.bendersdestiny.playertutorials.utils.memory;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.methods.GeneralMethods;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
@@ -20,6 +21,7 @@ import java.io.File;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -47,9 +49,9 @@ public class MemoryUtil {
 
     // Some caches
     @Getter
-    private static final Map<Integer, String> guiCache = new ConcurrentHashMap<>();
+    private static final Map<UUID, Map<Integer, String>> guiCache = new ConcurrentHashMap<>();
     @Getter
-    private static final Map<Integer, Tutorial> modifyTutorialCache = new ConcurrentHashMap<>();
+    private static final Map<UUID, Tutorial> modifyTutorialCache = new ConcurrentHashMap<>();
 
 
     /**
@@ -64,8 +66,8 @@ public class MemoryUtil {
      */
     public static void saveTutorials() {
         long startTime = System.currentTimeMillis();
-        PlayerTutorials.getInstance().getLogger().log(Level.INFO,
-                ChatUtil.format("&7Saving " + Tutorial.tutorialColor + "Tutorials &7..."));
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, LegacyComponentSerializer.legacySection()
+                .serialize(ChatUtil.translate("&7Saving " + Tutorial.tutorialColor + "Tutorials &7...")));
 
         String query = "INSERT INTO tutorials (name, icon) VALUES(?, ?)";
 
@@ -87,14 +89,14 @@ public class MemoryUtil {
                         tutorial.setId(keys.getInt(1));
                     }
                 } catch (Exception e) {
-                    PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
-                            ChatUtil.format("&cError retrieving generated ID for tutorial!"));
+                    PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, LegacyComponentSerializer.legacySection()
+                            .serialize(ChatUtil.translate("&cError retrieving generated ID for tutorial!")));
                 }
             }
 
-            PlayerTutorials.getInstance().getLogger().log(Level.INFO,
-                    ChatUtil.format("&7Successfully saved all " + Tutorial.tutorialColor +
-                            "&6Tutorials &7in &a" + ((System.currentTimeMillis() - startTime) / 1000.0) + " &7s"));
+            PlayerTutorials.getInstance().getLogger().log(Level.INFO, LegacyComponentSerializer.legacySection()
+                    .serialize(ChatUtil.translate("&7Successfully saved all " + Tutorial.tutorialColor + "&6Tutorials &7in &a" +
+                            ((System.currentTimeMillis() - startTime) / 1000.0) + " &7s")));
         } catch (SQLException e) {
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
                     "Couldn't save tutorials", e);
@@ -107,8 +109,8 @@ public class MemoryUtil {
      */
     public static void saveAreas() {
         long startTime = System.currentTimeMillis();
-        PlayerTutorials.getInstance().getLogger().log(Level.INFO,
-                ChatUtil.format("&7Saving " + Area.areaColor + "Areas &7..."));
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, LegacyComponentSerializer.legacySection()
+                .serialize(ChatUtil.translate("&7Saving " + Area.areaColor + "Areas &7...")));
 
         String query = "INSERT INTO areas (tutorialID, structureID, name, spawnPoint, priority) VALUES (?, ?, ?, ?, ?)";
 
@@ -140,12 +142,12 @@ public class MemoryUtil {
                 }
             }
 
-            PlayerTutorials.getInstance().getLogger().log(Level.INFO,
-                    ChatUtil.format("&aSuccessfully saved all " + Area.areaColor + "Areas &ain &6"
-                            + ((System.currentTimeMillis() - startTime) / 1000.0) + " &7s"));
+            PlayerTutorials.getInstance().getLogger().log(Level.INFO, LegacyComponentSerializer.legacySection()
+                    .serialize(ChatUtil.translate("&aSuccessfully saved all " + Area.areaColor + "Areas &ain &6" +
+                            ((System.currentTimeMillis() - startTime) / 1000.0) + " &7s")));
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
-                    ChatUtil.format("&cCouldn't save areas"), e);
+            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, LegacyComponentSerializer.legacySection()
+                    .serialize(ChatUtil.translate("&cCouldn't save areas" + e)));
         }
     }
 
@@ -165,8 +167,8 @@ public class MemoryUtil {
      */
     private static void saveGeneralTasks() {
         long startTime = System.currentTimeMillis();
-        PlayerTutorials.getInstance().getLogger().log(Level.INFO,
-                ChatUtil.format("&7Saving " + Task.taskColor + "Tasks &7..."));
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, LegacyComponentSerializer.legacySection()
+                .serialize(ChatUtil.translate("&7Saving " + Task.taskColor + "Tasks &7...")));
 
         String query = "INSERT INTO tasks (areaID, type, priority) VALUES (?, ?, ?)";
 
@@ -290,8 +292,8 @@ public class MemoryUtil {
      */
     public static void loadTutorials() {
         long loadingStartTime = System.currentTimeMillis();
-        PlayerTutorials.getInstance().getLogger().log(Level.INFO,
-                ChatUtil.format("&7Loading &6Tutorials..."));
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, LegacyComponentSerializer.legacySection()
+                .serialize(ChatUtil.translate("&7Loading &6Tutorials...")));
 
         String query = "SELECT * FROM tutorials";
         try (Connection connection = storage.getConnection();
@@ -311,9 +313,9 @@ public class MemoryUtil {
                 createdTutorials.put(tutorialID, t);
             }
 
-            PlayerTutorials.getInstance().getLogger().log(Level.FINE,
-                    ChatUtil.format("&7Loaded &6Tutorials &7in &a" +
-                            ((System.currentTimeMillis() - loadingStartTime) / 1000.0) + "s"));
+            PlayerTutorials.getInstance().getLogger().log(Level.FINE, LegacyComponentSerializer.legacySection()
+                    .serialize(ChatUtil.translate("&7Loaded &6Tutorials &7in &a" +
+                    ((System.currentTimeMillis() - loadingStartTime) / 1000.0) + "s")));
         } catch (SQLException e) {
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
                     "Couldn't load all tutorials!", e);
@@ -326,8 +328,8 @@ public class MemoryUtil {
      */
     public static void loadAreas() {
         long loadingStartTime = System.currentTimeMillis();
-        PlayerTutorials.getInstance().getLogger().log(Level.INFO,
-                ChatUtil.format("&7Loading Areas..."));
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, LegacyComponentSerializer.legacySection()
+                .serialize(ChatUtil.translate("&7Loading Areas...")));
 
         String query = "SELECT * FROM areas";
         try (Connection connection = storage.getConnection();
@@ -373,8 +375,8 @@ public class MemoryUtil {
      */
     public static void loadTasks() {
         long startTime = System.currentTimeMillis();
-        PlayerTutorials.getInstance().getLogger().log(Level.INFO,
-                ChatUtil.format("&7Loading Tasks..."));
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, LegacyComponentSerializer.legacySection()
+                .serialize(ChatUtil.translate("&7Loading Tasks...")));
 
         String query = "SELECT * FROM tasks";
 
@@ -397,9 +399,9 @@ public class MemoryUtil {
                 }
             }
 
-            PlayerTutorials.getInstance().getLogger().log(Level.INFO,
-                    ChatUtil.format("&7Loaded Tasks in &a"
-                            + ((System.currentTimeMillis() - startTime) / 1000.0) + "s"));
+            PlayerTutorials.getInstance().getLogger().log(Level.INFO, LegacyComponentSerializer.legacySection()
+                    .serialize(ChatUtil.translate("&7Loaded Tasks in &a" +
+                            ((System.currentTimeMillis() - startTime) / 1000.0) + "s")));
 
         } catch (SQLException e) {
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
@@ -471,8 +473,8 @@ public class MemoryUtil {
      */
     public static void loadStructures() {
         long start = System.currentTimeMillis();
-        PlayerTutorials.getInstance().getLogger().log(Level.INFO,
-                ChatUtil.format("&7Loading Structures..."));
+        PlayerTutorials.getInstance().getLogger().log(Level.INFO, LegacyComponentSerializer.legacySection()
+                .serialize(ChatUtil.translate("&7Loading Structures...")));
 
         String query = "SELECT * FROM structures";
         try (Connection connection = storage.getConnection();

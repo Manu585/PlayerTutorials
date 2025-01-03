@@ -13,7 +13,7 @@ public class ItemUtil {
 
         if (fillerMeta == null) throw new NullPointerException("FillerMeta is null!!");
 
-        fillerMeta.setDisplayName(ChatUtil.format("&7"));
+        fillerMeta.displayName(ChatUtil.translate("&7"));
         fillerItem.setItemMeta(fillerMeta);
         return fillerItem;
     }

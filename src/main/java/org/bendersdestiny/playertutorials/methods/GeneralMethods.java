@@ -1,9 +1,10 @@
 package org.bendersdestiny.playertutorials.methods;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
+import org.bendersdestiny.playertutorials.tutorial.Tutorial;
+import org.bendersdestiny.playertutorials.tutorial.area.Area;
+import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -86,9 +87,9 @@ public class GeneralMethods {
 	}
 
 	/**
-	 * Join the {@link org.bendersdestiny.playertutorials.tutorial.area.Area} Selection mode so players can
+	 * Join the {@link Area} Selection mode so players can
 	 * create the area they'd like to store in a
-	 * {@link org.bendersdestiny.playertutorials.tutorial.Tutorial}
+	 * {@link Tutorial}
 	 *
 	 * @param tutorialPlayer The {@link Player} who should enter the Selection mode
 	 */
@@ -112,27 +113,12 @@ public class GeneralMethods {
 		);
 		player.getInventory().setHeldItemSlot(4);
 
-		final Component mainTitle = Component.textOfChildren(
-				Component.text("Select the", TextColor.color(130, 130, 130)),
-				Component.space(),
-				Component.text("area", TextColor.color(182, 61, 209)),
-				Component.space(),
-				Component.text("with the", TextColor.color(130, 130, 130)),
-				Component.space(),
-				Component.text("Axe", TextColor.color(240, 196, 53)));
 
-		final Component subTitle = Component.textOfChildren(
-				Component.text("Left click:", TextColor.color(130, 130, 130)),
-				Component.space(),
-				Component.text("Pos1", TextColor.color(240, 196, 53)),
-				Component.text(",", TextColor.color(130, 130, 130)),
-				Component.space(),
-				Component.text("Right click:", TextColor.color(130, 130, 130)),
-				Component.space(),
-				Component.text("Pos2", TextColor.color(240, 196, 53)));
+		String mainTitle = "&#828282Select the &#b43cd2area &#828282with the &#f0c435Axe";
+		String subTitle = "&#828282Left click: &#f0c435Pos1&&#828282, &&#828282Right click: &#f0c435Pos2";
 
 		final Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(3000), Duration.ofMillis(500));
-		final Title title = Title.title(mainTitle, subTitle, times);
+		final Title title = Title.title(ChatUtil.translate(mainTitle), ChatUtil.translate(subTitle), times);
 
 		player.showTitle(title);
 	}

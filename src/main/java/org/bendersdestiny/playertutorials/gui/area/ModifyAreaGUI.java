@@ -6,8 +6,6 @@ import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.tutorial.area.Area;
 import org.bendersdestiny.playertutorials.tutorial.task.Task;
@@ -68,8 +66,7 @@ public class ModifyAreaGUI {
 
         if (meta == null) throw new NullPointerException("ItemMeta cannot be NULL!");
 
-        TextComponent component = Component.text(ChatUtil.format(this.area.getName()));
-        meta.displayName(component);
+        meta.displayName(ChatUtil.translate(this.area.getName()));
         item.setItemMeta(meta);
 
         return new GuiItem(item);

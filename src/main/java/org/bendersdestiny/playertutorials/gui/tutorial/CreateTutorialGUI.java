@@ -7,7 +7,6 @@ import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.gui.util.SelectIconGUI;
@@ -24,9 +23,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 public class CreateTutorialGUI {
@@ -38,8 +35,10 @@ public class CreateTutorialGUI {
     @Setter
     private Material tutorialIcon = Material.DIORITE; // DEFAULT
 
-    public CreateTutorialGUI() {
-        Map<Integer, String> cache = MemoryUtil.getGuiCache(); // Cache for Tutorial Name + Icon
+    public CreateTutorialGUI(Player player) {
+        UUID uuid = player.getUniqueId();
+
+        Map<Integer, String> cache = MemoryUtil.getGuiCache().computeIfAbsent(uuid, k -> new HashMap<>()); // Cache for Tutorial Name + Icon
 
         if (cache.containsKey(0)) {
             try {
@@ -47,13 +46,17 @@ public class CreateTutorialGUI {
             } catch (Exception ex) {
                 this.tutorialIcon = Material.DIORITE;
             }
-        }
-        if (cache.containsKey(1)) {
-            this.tutorialTitle = cache.get(1);
+        } else {
+            this.tutorialIcon = Material.DIORITE;
         }
 
-        Component titleComp = Component.text("Create Tutorial", TextColor.color(84, 199, 46));
-        String legacyTitle = LegacyComponentSerializer.legacySection().serialize(titleComp);
+        if (cache.containsKey(1)) {
+            this.tutorialTitle = cache.get(1);
+        } else {
+            this.tutorialTitle = "Tutorial";
+        }
+
+        String legacyTitle = LegacyComponentSerializer.legacySection().serialize(ChatUtil.translate("&#54c72eCreate Tutorial"));
         this.gui = new ChestGui(1, legacyTitle, PlayerTutorials.getInstance());
         this.pane = new StaticPane(0, 0, 9, 1);
 
@@ -76,9 +79,9 @@ public class CreateTutorialGUI {
         ItemMeta meta = stack.getItemMeta();
         if (meta == null) throw new NullPointerException("ItemMeta null");
 
-        meta.displayName(Component.text("Change Icon", TextColor.color(82, 135, 227)));
+        meta.displayName(ChatUtil.translate("&#5287e3Change Icon"));
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.text("Change the Icon of the Tutorial", TextColor.color(130, 130, 130)));
+        lore.add(ChatUtil.translate("&#828282Change the Icon of the Tutorial"));
         meta.lore(lore);
         stack.setItemMeta(meta);
 
@@ -95,9 +98,9 @@ public class CreateTutorialGUI {
         ItemMeta meta = stack.getItemMeta();
         if (meta == null) throw new NullPointerException("ItemMeta null");
 
-        meta.displayName(Component.text("Rename", TextColor.color(237, 210, 76)));
+        meta.displayName(ChatUtil.translate("&#edd24cRename"));
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.text("Left-Click to Change Name", TextColor.color(130, 130, 130)));
+        lore.add(ChatUtil.translate("&#828282Left-Click to Change Name"));
         meta.lore(lore);
 
         stack.setItemMeta(meta);
@@ -124,11 +127,11 @@ public class CreateTutorialGUI {
         ItemMeta meta = stack.getItemMeta();
         if (meta == null) throw new NullPointerException("ItemMeta null");
 
-        meta.displayName(Component.text("Save", TextColor.color(64, 184, 37)));
+        meta.displayName(ChatUtil.translate("&#40b825Save"));
 
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.text("Current Name: ").color(TextColor.color(130, 130, 130)).append(Component.text(this.tutorialTitle)));
-        lore.add(Component.text("Current Icon: ").color(TextColor.color(130, 130, 130)).append(Component.text(this.tutorialIcon.toString())));
+        lore.add(ChatUtil.translate("&#828282Current Name: " + this.tutorialTitle));
+        lore.add(ChatUtil.translate("&#828282Current Icon: " + "&#f0c435" + this.tutorialIcon.toString()));
         meta.lore(lore);
         stack.setItemMeta(meta);
 
@@ -137,20 +140,15 @@ public class CreateTutorialGUI {
                 // Create the tutorial in DB
                 Tutorial newTutorial = MemoryUtil.createTutorial(this.tutorialTitle, this.tutorialIcon);
                 if (newTutorial == null) {
-                    event.getWhoClicked().sendMessage(Component.text("Error creating tutorial!", TextColor.color(209, 65, 65)));
+                    event.getWhoClicked().sendMessage(ChatUtil.translate("&#d24141Error creating tutorial!"));
                     return;
                 }
 
-                event.getWhoClicked().sendMessage(
-                        Component.textOfChildren(
-                                Component.text("Created new tutorial", TextColor.color(130, 130, 130)),
-                                Component.space(),
-                                Component.text(this.tutorialTitle),
-                                Component.text(" (ID: ", TextColor.color(130, 130, 130)),
-                                Component.text(newTutorial.getId(), TextColor.color(240, 196, 53)),
-                                Component.text(")", TextColor.color(130, 130, 130))
-                        )
-                );
+                event.getWhoClicked().sendMessage(ChatUtil.translate("&#828282Created new Tutorial " +
+                        this.tutorialTitle +
+                        "&#828282 (ID: &#f0c435" +
+                        newTutorial.getId() +
+                        "&#828282)"));
 
                 // Clear the cache + reset
                 MemoryUtil.getGuiCache().clear();
@@ -161,11 +159,7 @@ public class CreateTutorialGUI {
                 event.getWhoClicked().closeInventory();
 
                 // Show the Modify GUI
-                ModifyTutorialGUI modify = new ModifyTutorialGUI(
-                        1,
-                        ChatUtil.format("&6Modify " + newTutorial.getName()),
-                        newTutorial
-                );
+                ModifyTutorialGUI modify = new ModifyTutorialGUI(newTutorial);
                 modify.getGui().show(event.getWhoClicked());
             }
         });

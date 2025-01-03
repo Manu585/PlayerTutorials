@@ -6,12 +6,16 @@ import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
+import org.bendersdestiny.playertutorials.gui.MasterGUI;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
+import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
+import org.bendersdestiny.playertutorials.utils.chat.prompts.TutorialRenamePrompt;
 import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bukkit.Material;
+import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationFactory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -25,9 +29,9 @@ public class ModifyTutorialGUI {
     private final StaticPane pane;
     private final Tutorial tutorial;
 
-    public ModifyTutorialGUI(int rows, String title, Tutorial tutorial) {
-        this.gui = new ChestGui(rows, title, PlayerTutorials.getInstance());
-        this.pane = new StaticPane(0, 0, 9, 1, Pane.Priority.HIGH);
+    public ModifyTutorialGUI(Tutorial tutorial) {
+        this.gui = new ChestGui(2, LegacyComponentSerializer.legacySection().serialize(ChatUtil.translate("&#4a6ad2Modify " + tutorial.getName())), PlayerTutorials.getInstance());
+        this.pane = new StaticPane(0, 0, 9, 2, Pane.Priority.HIGH);
 
         this.tutorial = tutorial;
 
@@ -41,6 +45,7 @@ public class ModifyTutorialGUI {
         this.pane.addItem(getChangeNameItem(), Slot.fromIndex(0));
         this.pane.addItem(getCreateAreaItem(), Slot.fromIndex(4));
         this.pane.addItem(getDeleteTutorialItem(), Slot.fromIndex(8));
+        this.pane.addItem(getBackItem(), Slot.fromIndex(13));
 
         this.pane.setOnClick(event -> event.setCancelled(true));
     }
@@ -51,17 +56,23 @@ public class ModifyTutorialGUI {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) throw new NullPointerException("ItemMeta cannot be null!");
 
-        meta.displayName(Component.text("Change Name", TextColor.color(240, 196, 53)));
+        meta.displayName(ChatUtil.translate("&#f0c435Change Name"));
 
         item.setItemMeta(meta);
 
         return new GuiItem(item, event -> {
             HumanEntity humanEntity = event.getWhoClicked();
             if (humanEntity instanceof Player p) {
-                // Caches the tutorial for renaming
                 if (this.tutorial != null) {
-                    MemoryUtil.getModifyTutorialCache().put(0, this.tutorial);
-                    // TODO: Close Inventory -> Start Conversation -> Update DB + Memory entry -> Open Tutorial again with new name
+                    MemoryUtil.getModifyTutorialCache().put(p.getUniqueId(), this.tutorial);
+                    p.closeInventory();
+                    ConversationFactory factory = new ConversationFactory(PlayerTutorials.getInstance());
+                    Conversation conversation = factory.withFirstPrompt(new TutorialRenamePrompt())
+                            .withLocalEcho(false)
+                            .withTimeout(60)
+                            .buildConversation(p);
+
+                    conversation.begin();
                 }
             }
         });
@@ -73,7 +84,7 @@ public class ModifyTutorialGUI {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) throw new NullPointerException("ItemMeta cannot be null!");
 
-        meta.displayName(Component.text("Delete Tutorial", TextColor.color(220, 72, 72)));
+        meta.displayName(ChatUtil.translate("&#dc4848Delete Tutorial"));
 
         item.setItemMeta(meta);
 
@@ -81,17 +92,11 @@ public class ModifyTutorialGUI {
             if (event.getWhoClicked() instanceof Player p) {
                 if (this.tutorial != null) {
                     MemoryUtil.deleteTutorial(this.tutorial);
-                    p.sendMessage(Component.textOfChildren(
-                            Component.text("Tutorial", TextColor.color(130, 130, 130)),
-                            Component.space(),
-                            Component.text("'", TextColor.color(130, 130, 130)),
-                            Component.text(this.tutorial.getName()),
-                            Component.text("'", TextColor.color(130, 130, 130)),
-                            Component.space(),
-                            Component.text("has been", TextColor.color(130, 130, 130)),
-                            Component.space(),
-                            Component.text("deleted", TextColor.color(220, 72, 72))));
+                    p.sendMessage(ChatUtil.translate("&#828282Tutorial '" +
+                            this.tutorial.getName() + "&#828282'" + " has been" + " &#dc4848deleted"));
+
                     p.closeInventory();
+                    new MasterGUI().getGui().show(p);
                 }
             }
         });
@@ -103,7 +108,7 @@ public class ModifyTutorialGUI {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) throw new NullPointerException("ItemMeta cannot be null!");
 
-        meta.displayName(Component.text("Create Area", TextColor.color(182, 61, 209)));
+        meta.displayName(ChatUtil.translate("&#b43cd2Create Area"));
         item.setItemMeta(meta);
 
         return new GuiItem(item, event -> {
@@ -111,6 +116,25 @@ public class ModifyTutorialGUI {
                 return;
             }
             // TODO: Enter Area Selection Mode -> Select Pos1 + Pos2 -> Save Area -> Open Edit Area Menu
+        });
+    }
+
+
+    @Contract(" -> new")
+    private @NotNull GuiItem getBackItem() {
+        ItemStack item = new ItemStack(Material.ARROW);
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) throw new NullPointerException("ItemMeta cannot be null!");
+
+        meta.displayName(ChatUtil.translate("&#dc4848Back"));
+        item.setItemMeta(meta);
+
+        return new GuiItem(item, event -> {
+            if (!(event.getWhoClicked() instanceof Player p)) {
+                return;
+            }
+            p.closeInventory();
+            new MasterGUI().getGui().show(p);
         });
     }
 }

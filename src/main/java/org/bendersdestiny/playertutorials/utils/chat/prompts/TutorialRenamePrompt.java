@@ -1,9 +1,9 @@
 package org.bendersdestiny.playertutorials.utils.chat.prompts;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
-import org.bendersdestiny.playertutorials.gui.tutorial.CreateTutorialGUI;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bendersdestiny.playertutorials.gui.tutorial.ModifyTutorialGUI;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
+import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
@@ -15,23 +15,26 @@ import org.jetbrains.annotations.Nullable;
 public class TutorialRenamePrompt extends StringPrompt {
 	@Override
 	public @NotNull String getPromptText(@NotNull ConversationContext conversationContext) {
-		return ChatUtil.format("&7Type the name of the &6tutorial &7or type '&6cancel&7' to cancel.");
+		return LegacyComponentSerializer.legacySection().serialize(ChatUtil.translate("&#828282Type the name of the &#f0c435tutorial &#828282or type '&#f0c435cancel&#828282' to cancel."));
 	}
 
 	@Override
 	public @Nullable Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
 		Player player = (Player) context.getForWhom();
 		if (input == null || input.trim().isEmpty()) {
-			player.sendMessage(Component.text("The tutorial name cannot be empty. Please try again.", TextColor.color(220, 72, 72)));
+			player.sendMessage(ChatUtil.translate("&#dc4848The tutorial name cannot be empty. Please try again."));
 			return this;
 		}
 
 		if (input.equalsIgnoreCase("cancel")) {
-			player.sendMessage(Component.text("Tutorial renaming cancelled.", TextColor.color(130, 130, 130)));
+			player.sendMessage(ChatUtil.translate("&#828282Tutorial renaming cancelled."));
 			return END_OF_CONVERSATION;
 		}
 
-		new CreateTutorialGUI().getGui().show((HumanEntity) context.getForWhom());
+		MemoryUtil.getModifyTutorialCache().get(player.getUniqueId()).setName(input.trim());
+		MemoryUtil.renameTutorial(MemoryUtil.getModifyTutorialCache().get(player.getUniqueId()), input.trim());
+
+		new ModifyTutorialGUI(MemoryUtil.getModifyTutorialCache().get(player.getUniqueId())).getGui().show((HumanEntity) context.getForWhom());
 
 		return END_OF_CONVERSATION;
 	}

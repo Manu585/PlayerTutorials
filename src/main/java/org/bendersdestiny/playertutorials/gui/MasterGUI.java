@@ -7,8 +7,6 @@ import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.gui.tutorial.CreateTutorialGUI;
@@ -43,8 +41,7 @@ public class MasterGUI {
 
 
     public MasterGUI() {
-        Component titleComp = Component.text("Tutorials", TextColor.color(74, 185, 210));
-        String legacyTitle = LegacyComponentSerializer.legacySection().serialize(titleComp);
+        String legacyTitle = LegacyComponentSerializer.legacySection().serialize(ChatUtil.translate("&#4bb9d7Tutorials"));
 
         this.gui = new ChestGui(4, legacyTitle, PlayerTutorials.getInstance());
         this.pane = new StaticPane(0, 0, 9, 4, Pane.Priority.HIGH);
@@ -78,11 +75,7 @@ public class MasterGUI {
                 if (whoClicked instanceof Player p) {
                     p.closeInventory();
                     Tutorial tutorial = MemoryUtil.getCreatedTutorials().get(tutorialItem.getItem().getItemMeta().getCustomModelData());
-                    ModifyTutorialGUI gui = new ModifyTutorialGUI(
-                            1,
-                            ChatUtil.format("&#4a6ad2Modify " + tutorial.getName()),
-                            tutorial);
-
+                    ModifyTutorialGUI gui = new ModifyTutorialGUI(tutorial);
                     gui.getGui().show(p);
                 }
             });
@@ -98,7 +91,7 @@ public class MasterGUI {
 
         if (itemMeta == null) throw new NullPointerException("ItemMeta cannot be null");
 
-        itemMeta.displayName(Component.text("Create Tutorial", TextColor.color(84, 199, 46)));
+        itemMeta.displayName(ChatUtil.translate("&#54c72eCreate Tutorial"));
 
         createTutorialItem.setItemMeta(itemMeta);
 
@@ -106,7 +99,7 @@ public class MasterGUI {
             HumanEntity whoClicked = event.getWhoClicked();
             if (whoClicked instanceof Player p) {
                 p.closeInventory();
-                CreateTutorialGUI gui = new CreateTutorialGUI();
+                CreateTutorialGUI gui = new CreateTutorialGUI(p);
                 gui.getGui().show(p);
             }
         });
@@ -119,9 +112,9 @@ public class MasterGUI {
 
             if (tutorialItemMeta == null) throw new NullPointerException("ItemMeta cannot be null");
 
-            tutorialItemMeta.displayName(Component.text(tutorial.getName()));
-            tutorialItemMeta.setCustomModelData(tutorial.getId());
+            tutorialItemMeta.displayName(ChatUtil.translate(tutorial.getName()));
 
+            tutorialItemMeta.setCustomModelData(tutorial.getId());
             tutorialItemStack.setItemMeta(tutorialItemMeta);
 
             this.tutorialItems.add(new GuiItem(tutorialItemStack));

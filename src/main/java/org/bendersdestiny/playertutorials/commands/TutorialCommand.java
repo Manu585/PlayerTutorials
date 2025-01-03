@@ -22,7 +22,7 @@ public class TutorialCommand {
 
     @Execute(name = "create", aliases = "c")
     void createCommand(@Context Player sender) {
-        new CreateTutorialGUI().getGui().show(sender);
+        new CreateTutorialGUI(sender).getGui().show(sender);
     }
 
     @Execute(name = "selection")

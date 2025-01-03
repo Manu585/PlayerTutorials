@@ -17,7 +17,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SelectIconGUI {
 	@Getter
@@ -58,11 +60,16 @@ public class SelectIconGUI {
 				HumanEntity whoClicked = event.getWhoClicked();
 				if (whoClicked instanceof Player p) {
 					p.closeInventory();
-					MemoryUtil.getGuiCache().put(0, clickedItem.getType().toString());
-					new CreateTutorialGUI().getGui().show(p);
+
+					Map<Integer, String> cache = MemoryUtil.getGuiCache()
+							.computeIfAbsent(p.getUniqueId(), k -> new HashMap<>());
+					cache.put(0, clickedItem.getType().toString());
+
+					new CreateTutorialGUI(p).getGui().show(p);
 				}
 			}
 		});
+
 	}
 
 	private void createIconPages() {
