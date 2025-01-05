@@ -13,10 +13,10 @@ import org.bendersdestiny.playertutorials.tutorial.Tutorial;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.chat.prompts.TutorialRenamePrompt;
 import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
+import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPlayer;
 import org.bukkit.Material;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationFactory;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -34,7 +34,6 @@ public class ModifyTutorialGUI {
         this.pane = new StaticPane(0, 0, 9, 2, Pane.Priority.HIGH);
 
         this.tutorial = tutorial;
-
         this.setupUI();
     }
 
@@ -57,24 +56,21 @@ public class ModifyTutorialGUI {
         if (meta == null) throw new NullPointerException("ItemMeta cannot be null!");
 
         meta.displayName(ChatUtil.translate("&#f0c435Change Name"));
-
         item.setItemMeta(meta);
 
         return new GuiItem(item, event -> {
-            HumanEntity humanEntity = event.getWhoClicked();
-            if (humanEntity instanceof Player p) {
-                if (this.tutorial != null) {
-                    MemoryUtil.getModifyTutorialCache().put(p.getUniqueId(), this.tutorial);
-                    p.closeInventory();
-                    ConversationFactory factory = new ConversationFactory(PlayerTutorials.getInstance());
-                    Conversation conversation = factory.withFirstPrompt(new TutorialRenamePrompt())
-                            .withLocalEcho(false)
-                            .withTimeout(60)
-                            .buildConversation(p);
+            if (!(event.getWhoClicked() instanceof Player p)) return;
 
-                    conversation.begin();
-                }
-            }
+            p.closeInventory();
+
+            ConversationFactory factory = new ConversationFactory(PlayerTutorials.getInstance());
+            Conversation conversation = factory
+                    .withFirstPrompt(new TutorialRenamePrompt(this.tutorial))
+                    .withLocalEcho(false)
+                    .withTimeout(60)
+                    .buildConversation(p);
+
+            conversation.begin();
         });
     }
 
@@ -112,13 +108,17 @@ public class ModifyTutorialGUI {
         item.setItemMeta(meta);
 
         return new GuiItem(item, event -> {
-            if (!(event.getWhoClicked() instanceof Player p)) {
-                return;
+            if (!(event.getWhoClicked() instanceof Player p)) return;
+
+            TutorialPlayer tutorialPlayer = TutorialPlayer.getPlayer(p.getUniqueId());
+            if (tutorialPlayer != null) {
+                tutorialPlayer.setEditingTutorial(this.tutorial);
+                tutorialPlayer.enterAreaSelectionMode();
+                p.closeInventory();
+                // TODO: Enter Area Selection Mode -> Select Pos1 + Pos2 -> Save Area -> Open Edit Area Menu
             }
-            // TODO: Enter Area Selection Mode -> Select Pos1 + Pos2 -> Save Area -> Open Edit Area Menu
         });
     }
-
 
     @Contract(" -> new")
     private @NotNull GuiItem getBackItem() {
@@ -138,26 +138,3 @@ public class ModifyTutorialGUI {
         });
     }
 }
-
-//                          POSSIBLE APPROACH FOR CREATING AN AREA
-//            Structure structure = new Structure(0, 0, new File("TestStructure.schem"));
-//
-//            List<Task> tasks = new ArrayList<>();
-//            tasks.add(new CommandTask(0, 0, 0, "TestCommand"));
-//
-//            Area newArea = MemoryUtil.createArea(
-//                    this.tutorial.getId(),
-//                    structure,
-//                    "TestArea",
-//                    new Location(Bukkit.getWorld("world"), 0, 64, 0),
-//                    tasks,
-//                    1
-//            );
-//
-//            if (newArea == null) {
-//                p.sendMessage(ChatUtil.format("&cError creating the new area!"));
-//                return;
-//            }
-//
-//            p.sendMessage(ChatUtil.format("&aSuccessfully created a new area with ID &e"
-//                    + newArea.getAreaID() + "&a!"));

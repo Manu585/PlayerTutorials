@@ -9,6 +9,7 @@ import org.bendersdestiny.playertutorials.methods.GeneralMethods;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
 import org.bendersdestiny.playertutorials.tutorial.area.Area;
 import org.bendersdestiny.playertutorials.tutorial.area.structure.Structure;
+import org.bendersdestiny.playertutorials.tutorial.area.structure.StructureBlock;
 import org.bendersdestiny.playertutorials.tutorial.task.Task;
 import org.bendersdestiny.playertutorials.tutorial.task.tasks.CommandTask;
 import org.bendersdestiny.playertutorials.tutorial.task.tasks.TeleportTask;
@@ -17,8 +18,8 @@ import org.bendersdestiny.playertutorials.utils.memory.storage.Storage;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-import java.io.File;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -250,7 +251,7 @@ public class MemoryUtil {
      * SAVE ALL STRUCTURES
      */
     public static void saveStructures() {
-        String query = "INSERT INTO structures (areaID, schematic) VALUES (?, ?)";
+        String query = "INSERT INTO structures (areaID) VALUES (?)";
 
         try (Connection connection = storage.getConnection();
              PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -259,10 +260,8 @@ public class MemoryUtil {
                 if (structure.getStructureID() != 0) {
                     continue;
                 }
+
                 ps.setInt(1, structure.getAreaID());
-                ps.setString(2, (structure.getStructureSchematic() != null)
-                        ? structure.getStructureSchematic().getPath()
-                        : "");
                 ps.executeUpdate();
 
                 try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -271,8 +270,10 @@ public class MemoryUtil {
                     }
                 }
             }
+
             PlayerTutorials.getInstance().getLogger().log(Level.INFO,
                     "Successfully saved all Structures");
+
         } catch (SQLException e) {
             PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
                     "Couldn't save structure", e);
@@ -473,10 +474,10 @@ public class MemoryUtil {
      */
     public static void loadStructures() {
         long start = System.currentTimeMillis();
-        PlayerTutorials.getInstance().getLogger().log(Level.INFO, LegacyComponentSerializer.legacySection()
-                .serialize(ChatUtil.translate("&7Loading Structures...")));
+        PlayerTutorials.getInstance().getLogger().info("Loading Structures...");
 
-        String query = "SELECT * FROM structures";
+        String query = "SELECT structureID, areaID FROM structures";
+
         try (Connection connection = storage.getConnection();
              PreparedStatement ps = connection.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
@@ -484,22 +485,22 @@ public class MemoryUtil {
             while (rs.next()) {
                 int structureID = rs.getInt("structureID");
                 int areaID = rs.getInt("areaID");
-                String schematic = rs.getString("schematic");
 
-                Structure structure = new Structure(
-                        structureID,
-                        areaID,
-                        new File(schematic)
-                );
+                List<StructureBlock> blocks = new ArrayList<>();
+
+                Structure structure = new Structure(structureID, areaID, blocks);
                 createdStructures.put(structureID, structure);
             }
 
-            PlayerTutorials.getInstance().getLogger().log(Level.FINE,
-                    "&7Loaded Structures in &a"
-                            + ((System.currentTimeMillis() - start) / 1000.0) + "s");
+            PlayerTutorials.getInstance().getLogger().info(
+                    "Loaded Structures in " +
+                            ((System.currentTimeMillis() - start) / 1000.0) + "s"
+            );
+
         } catch (SQLException e) {
-            PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
-                    "Couldn't load structures!", e);
+            PlayerTutorials.getInstance().getLogger().log(
+                    Level.SEVERE, "Couldn't load structures!", e
+            );
         }
     }
 
@@ -749,4 +750,81 @@ public class MemoryUtil {
                     "Error linking areaID=" + areaID + " with taskID=" + taskID, e);
         }
     }
+
+    /**
+     * Saves blocks in an {@link Area} in the DB
+     *
+     * @param area Blocks in area
+     * @param pos1 First position
+     * @param pos2 Second position
+     */
+    public static void saveAreaBlocks(Area area, Location pos1, Location pos2) {
+        int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
+        int minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
+        int minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
+        int maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
+        int maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
+        int maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
+
+        String sql = "INSERT OR IGNORE INTO area_blocks (areaID, relativeX, relativeY, relativeZ, blockType) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = storage.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            // Iterate all blocks in bounding box
+            for (int x = minX; x <= maxX; x++) {
+                for (int y = minY; y <= maxY; y++) {
+                    for (int z = minZ; z <= maxZ; z++) {
+                        Location loc = new Location(pos1.getWorld(), x, y, z);
+                        Material mat = loc.getBlock().getType();
+
+                        int relX = x - minX;
+                        int relY = y - minY;
+                        int relZ = z - minZ;
+
+                        ps.setInt(1, area.getAreaID());
+                        ps.setInt(2, relX);
+                        ps.setInt(3, relY);
+                        ps.setInt(4, relZ);
+                        ps.setString(5, mat.toString());
+                        ps.addBatch();
+                    }
+                }
+            }
+            ps.executeBatch();
+        } catch (SQLException e) {
+            PlayerTutorials.getInstance().getLogger().severe("Error saving blocks for area " + area.getName());
+            e.printStackTrace();
+        }
+    }
+
+
+    public static Structure loadStructure(int areaID) {
+        String query = "SELECT relativeX, relativeY, relativeZ, blockType FROM area_blocks WHERE areaID=?";
+        List<StructureBlock> blocks = new ArrayList<>();
+
+        try (Connection conn = storage.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, areaID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int rx = rs.getInt("relativeX");
+                    int ry = rs.getInt("relativeY");
+                    int rz = rs.getInt("relativeZ");
+                    String matStr = rs.getString("blockType");
+
+                    Material material = Material.matchMaterial(matStr);
+                    if (material == null) material = Material.AIR;
+
+                    blocks.add(new StructureBlock(rx, ry, rz, material));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return new Structure(0, areaID, blocks);
+    }
+
 }

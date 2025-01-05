@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
+import org.bukkit.Color;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Matcher;
@@ -40,6 +41,18 @@ public class ChatUtil {
 			msg = msg.replace(hexMatcher.group(0), hexColor);
 		}
 		return ChatColor.translateAlternateColorCodes('&', msg);
+	}
+
+	public static Color parseTutorialColor(String tutorialName) {
+		Matcher matcher = HEX_PATTERN.matcher(tutorialName);
+		if (matcher.find()) {
+			String hex = matcher.group(1);
+			int r = Integer.parseInt(hex.substring(0, 2), 16);
+			int g = Integer.parseInt(hex.substring(2, 4), 16);
+			int b = Integer.parseInt(hex.substring(4, 6), 16);
+			return Color.fromRGB(r, g, b);
+		}
+		return Color.WHITE;
 	}
 
 	/**

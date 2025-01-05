@@ -86,6 +86,7 @@ public class Storage {
 		this.createCommandTaskTable();
 		this.createTeleportTaskTable();
 		this.createAreaTasksTable();
+		this.createAreaBlocksTable();
 	}
 
 	/**
@@ -158,20 +159,21 @@ public class Storage {
 		String sqlite =
 				"CREATE TABLE IF NOT EXISTS structures (" +
 						"  structureID INTEGER PRIMARY KEY AUTOINCREMENT," +
-						"  areaID INTEGER," +
-						"  schematic TEXT," +
+						"  areaID INTEGER NOT NULL," +
 						"  FOREIGN KEY(areaID) REFERENCES areas(areaID) ON DELETE CASCADE" +
 						")";
+
 		String mysql =
 				"CREATE TABLE IF NOT EXISTS structures (" +
 						"  structureID INT AUTO_INCREMENT PRIMARY KEY," +
-						"  areaID INT," +
-						"  schematic TEXT," +
+						"  areaID INT NOT NULL," +
 						"  FOREIGN KEY(areaID) REFERENCES areas(areaID) ON DELETE CASCADE" +
 						") ENGINE=InnoDB";
 
-		runStatement(this.storageType.equalsIgnoreCase("sqlite") ? sqlite : mysql,
-				"Failed to create structures table!");
+		runStatement(
+				this.storageType.equalsIgnoreCase("sqlite") ? sqlite : mysql,
+				"Failed to create structures table!"
+		);
 	}
 
 	/**
@@ -268,10 +270,38 @@ public class Storage {
 				"Failed to create area_tasks table!");
 	}
 
+	public void createAreaBlocksTable() {
+		String sqlite =
+				"CREATE TABLE IF NOT EXISTS area_blocks (" +
+						"  areaID INTEGER NOT NULL," +
+						"  relativeX INT NOT NULL," +
+						"  relativeY INT NOT NULL," +
+						"  relativeZ INT NOT NULL," +
+						"  blockType VARCHAR(50) NOT NULL," +
+						"  PRIMARY KEY (areaID, relativeX, relativeY, relativeZ)," +
+						"  FOREIGN KEY(areaID) REFERENCES areas(areaID) ON DELETE CASCADE" +
+						")";
+
+		String mysql =
+				"CREATE TABLE IF NOT EXISTS area_blocks (" +
+						"  areaID INT NOT NULL," +
+						"  relativeX INT NOT NULL," +
+						"  relativeY INT NOT NULL," +
+						"  relativeZ INT NOT NULL," +
+						"  blockType VARCHAR(50) NOT NULL," +
+						"  PRIMARY KEY (areaID, relativeX, relativeY, relativeZ)," +
+						"  FOREIGN KEY(areaID) REFERENCES areas(areaID) ON DELETE CASCADE" +
+						") ENGINE=InnoDB";
+
+		runStatement(
+				this.storageType.equalsIgnoreCase("sqlite") ? sqlite : mysql,
+				"Failed to create area_blocks table!"
+		);
+	}
+
 	private void runStatement(String sql, String errorMessage) {
 		try (Connection connection = this.getConnection();
 			 Statement statement = connection.createStatement()) {
-
 			statement.execute(sql);
 		} catch (SQLException e) {
 			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, errorMessage, e);

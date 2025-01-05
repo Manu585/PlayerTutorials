@@ -3,8 +3,9 @@ package org.bendersdestiny.playertutorials.tutorial.area.structure;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
+import org.bukkit.Material;
 
-import java.io.File;
+import java.util.List;
 
 /**
  * A structure is the physical aspect to an
@@ -16,7 +17,8 @@ import java.io.File;
 public class Structure {
     private int structureID;
     private int areaID;
-    private File structureSchematic;
+
+    private List<StructureBlock> blocks;
 
     public static final String structureColor = "#2863ed";
 
@@ -26,15 +28,35 @@ public class Structure {
      *
      * @param structureID Unique structure ID
      * @param areaID The ID of the area the Structure correlates to
-     * @param structureSchematic The path to the .schem file
      */
-    public Structure(int structureID, int areaID, File structureSchematic) {
+    public Structure(int structureID, int areaID, List<StructureBlock> blocks) {
         this.structureID = structureID;
         this.areaID = areaID;
-        this.structureSchematic = structureSchematic;
+        this.blocks = blocks;
     }
 
-    public void spawn(Location center) {}
+    // Example: place all the blocks at 'center'
+    public void spawn(Location center) {
+        for (StructureBlock block : blocks) {
+            Location loc = center.clone().add(
+                    block.getRelativeX(),
+                    block.getRelativeY(),
+                    block.getRelativeZ()
+            );
+            loc.getBlock().setType(block.getMaterial());
+        }
+    }
 
-    public void destroy(Location center) {}
+    public void destroy(Location center) {
+        for (StructureBlock block : blocks) {
+            Location loc = center.clone().add(
+                    block.getRelativeX(),
+                    block.getRelativeY(),
+                    block.getRelativeZ()
+            );
+            loc.getBlock().setType(Material.AIR);
+        }
+    }
 }
+
+
