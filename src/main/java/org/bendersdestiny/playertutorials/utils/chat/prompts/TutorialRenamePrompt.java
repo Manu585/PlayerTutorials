@@ -1,6 +1,5 @@
 package org.bendersdestiny.playertutorials.utils.chat.prompts;
 
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bendersdestiny.playertutorials.gui.tutorial.ModifyTutorialGUI;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
@@ -22,7 +21,7 @@ public class TutorialRenamePrompt extends StringPrompt {
 
 	@Override
 	public @NotNull String getPromptText(@NotNull ConversationContext conversationContext) {
-		return LegacyComponentSerializer.legacySection().serialize(ChatUtil.translate("&#828282Type the name of the &#f0c435tutorial &#828282or type '&#f0c435cancel&#828282' to cancel."));
+		return ChatUtil.translateString("&#828282Type the name of the &#f0c435tutorial &#828282or type '&#f0c435cancel&#828282' to cancel.");
 	}
 
 	@Override

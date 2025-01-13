@@ -34,7 +34,6 @@ public class SQLiteStorage {
 	}
 
 	public Connection getConnection() throws SQLException {
-		// Only request connection from the pool when needed
 		if (connection == null || connection.isClosed()) {
 			connection = dataSource.getConnection();
 		}

@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.methods.GeneralMethods;
 import org.bendersdestiny.playertutorials.tutorial.task.Task;
+import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -31,7 +32,11 @@ public class TeleportTask extends Task {
 		if (player != null) {
 			player.teleport(this.to);
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,"Error while trying to teleport player to new location!\nLocation: " + GeneralMethods.locationToString(to));
+
+			PlayerTutorials.getInstance().getLogger().log(
+					Level.SEVERE,
+					ChatUtil.translateString("&cError while trying to teleport player to new location!\nLocation: " + GeneralMethods.locationToString(to)));
+
 		}
 	}
 
@@ -45,7 +50,11 @@ public class TeleportTask extends Task {
 		if (player != null) {
 			player.teleport(this.from);
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE, "Error while trying to teleport player back to old location!");
+
+			PlayerTutorials.getInstance().getLogger().log(
+					Level.SEVERE,
+					ChatUtil.translateString("&cError while trying to teleport player back to old location!"));
+
 		}
 	}
 }

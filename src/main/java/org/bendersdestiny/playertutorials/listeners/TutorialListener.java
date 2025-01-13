@@ -10,12 +10,14 @@ import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPl
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import static org.bendersdestiny.playertutorials.utils.chat.ChatUtil.parseTutorialColor;
 
@@ -28,7 +30,7 @@ public class TutorialListener implements Listener {
 		TutorialPlayer.registerPlayer(new TutorialPlayer(p.getUniqueId()));
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void areaSelectorInteract(PlayerInteractEvent e) {
 		if (e.getHand() != EquipmentSlot.HAND) return;
 
@@ -86,14 +88,14 @@ public class TutorialListener implements Listener {
 	/**
 	 * Simple utility to convert a Location to a readable string.
 	 */
-	private String locToString(Location loc) {
+	private @NotNull String locToString(@NotNull Location loc) {
 		return String.format("(%d, %d, %d)", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 	}
 
 	/**
 	 * Draw a particle outline around the cuboid defined by pos1 and pos2.
 	 */
-	private void drawParticleOutline(Player p, Location pos1, Location pos2, Color color) {
+	private void drawParticleOutline(@NotNull Player p, @NotNull Location pos1, @NotNull Location pos2, Color color) {
 		World world = p.getWorld();
 
 		int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
@@ -130,7 +132,7 @@ public class TutorialListener implements Listener {
 	/**
 	 * Helper method to spawn a single particle at the given block coords.
 	 */
-	private void spawnParticle(World world, int x, int y, int z, Particle.DustOptions dust) {
+	private void spawnParticle(@NotNull World world, int x, int y, int z, Particle.DustOptions dust) {
 		world.spawnParticle(Particle.DUST,
 				x + 0.5, y + 0.5, z + 0.5,
 				1,
@@ -140,7 +142,7 @@ public class TutorialListener implements Listener {
 		);
 	}
 
-	private void sendAcceptMessage(Player p) {
+	private void sendAcceptMessage(@NotNull Player p) {
 		Component part1 = ChatUtil.translate("&#828282Do you want to ");
 
 		Component accept = ChatUtil.translate("&#4cc734&naccept")

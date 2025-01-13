@@ -7,7 +7,6 @@ import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.gui.tutorial.CreateTutorialGUI;
 import org.bendersdestiny.playertutorials.gui.tutorial.ModifyTutorialGUI;
@@ -41,9 +40,7 @@ public class MasterGUI {
 
 
     public MasterGUI() {
-        String legacyTitle = LegacyComponentSerializer.legacySection().serialize(ChatUtil.translate("&#4bb9d7Tutorials"));
-
-        this.gui = new ChestGui(4, legacyTitle, PlayerTutorials.getInstance());
+        this.gui = new ChestGui(4, ChatUtil.translateString("&#4bb9d7Tutorials"), PlayerTutorials.getInstance());
         this.pane = new StaticPane(0, 0, 9, 4, Pane.Priority.HIGH);
 
         this.fillTutorialItemList();
@@ -99,7 +96,7 @@ public class MasterGUI {
             HumanEntity whoClicked = event.getWhoClicked();
             if (whoClicked instanceof Player p) {
                 p.closeInventory();
-                CreateTutorialGUI gui = new CreateTutorialGUI(p);
+                CreateTutorialGUI gui = new CreateTutorialGUI(null, null);
                 gui.getGui().show(p);
             }
         });

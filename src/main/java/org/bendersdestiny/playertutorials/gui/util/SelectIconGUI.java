@@ -8,37 +8,33 @@ import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.gui.tutorial.CreateTutorialGUI;
-import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
+import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bukkit.Material;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class SelectIconGUI {
 	@Getter
 	private final ChestGui gui;
 	private final PaginatedPane paginatedPane;
-
 	private final List<StaticPane> iconPages = new ArrayList<>();
-
-	@Getter
-	private ItemStack clickedItem;
+	private final CreateTutorialGUI parentGUI;
 
 	final int maxIconsPerPage = 27;
 
-	public SelectIconGUI() {
-		this.gui = new ChestGui(4, "Icons");
-		this.paginatedPane = new PaginatedPane(9, 4);
-		this.paginatedPane.setVisible(true);
-		this.setupUI();
+	public SelectIconGUI(CreateTutorialGUI parentGUI) {
+		this.parentGUI = parentGUI;
 
+		this.gui = new ChestGui(4, ChatUtil.translateString("Icons"), PlayerTutorials.getInstance());
+		this.paginatedPane = new PaginatedPane(0,0,9, 4);
+
+		this.setupUI();
 		this.gui.setOnGlobalClick(click -> click.setCancelled(true));
 	}
 
@@ -56,24 +52,22 @@ public class SelectIconGUI {
 
 		this.paginatedPane.setOnClick(event -> {
 			if (event.getRawSlot() < 27) {
-				clickedItem = event.getCurrentItem();
-				HumanEntity whoClicked = event.getWhoClicked();
-				if (whoClicked instanceof Player p) {
+				ItemStack clickedItem = event.getCurrentItem();
+				if (clickedItem != null && clickedItem.getType() != Material.AIR) {
+					Player p = (Player) event.getWhoClicked();
 					p.closeInventory();
 
-					Map<Integer, String> cache = MemoryUtil.getGuiCache()
-							.computeIfAbsent(p.getUniqueId(), k -> new HashMap<>());
-					cache.put(0, clickedItem.getType().toString());
-
-					new CreateTutorialGUI(p).getGui().show(p);
+					parentGUI.setTutorialIcon(clickedItem.getType());
+					parentGUI.updateGUI();
+					parentGUI.getGui().show(p);
+					p.sendMessage(ChatUtil.translate("&aTutorial icon updated to " + clickedItem.getType()));
 				}
 			}
 		});
-
 	}
 
 	private void createIconPages() {
-		StaticPane currentPage = new StaticPane(9, 4);
+		StaticPane currentPage = new StaticPane(0, 0, 9, 4);
 		int currentIndex = 0;
 
 		for (Material material : Material.values()) {
@@ -89,7 +83,7 @@ public class SelectIconGUI {
 					addNavigationButtons(currentPage);
 					this.iconPages.add(currentPage);
 
-					currentPage = new StaticPane(9, 4);
+					currentPage = new StaticPane(0, 0, 9, 4);
 					currentIndex = 0;
 				}
 			} catch (IllegalArgumentException ignored) {}

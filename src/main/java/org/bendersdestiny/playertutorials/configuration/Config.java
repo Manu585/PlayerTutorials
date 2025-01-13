@@ -2,6 +2,7 @@ package org.bendersdestiny.playertutorials.configuration;
 
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
+import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -30,19 +31,42 @@ public class Config {
 		if (!this.configFile.exists()) {
 			try {
 				if (this.configFile.getParentFile().mkdirs()) {
-					plugin.getLogger().log(Level.INFO, "Successfully created necessary directories!");
+
+					plugin.getLogger().log(
+							Level.INFO,
+							ChatUtil.translateString("&aSuccessfully created necessary directories!")
+					);
+
 				}
 				plugin.saveResource(fileName, false);
-				plugin.getLogger().log(Level.INFO, "Successfully created config file: " + fileName);
+
+				plugin.getLogger().log(
+						Level.INFO,
+						ChatUtil.translateString("&aSuccessfully created config file: " + fileName)
+				);
+
 			} catch (Exception e) {
-				plugin.getLogger().log(Level.SEVERE, "Failed to create config file: " + fileName, e);
+
+				plugin.getLogger().log(
+						Level.SEVERE,
+						ChatUtil.translateString("&cFailed to create config file: " + fileName),
+						e
+				);
+
 			}
 		}
+
 		this.config = new YamlConfiguration();
+
 		try {
 			this.config.load(configFile);
 		} catch (IOException | InvalidConfigurationException e) {
-			plugin.getLogger().log(Level.SEVERE, "Failed to load config file: " + fileName, e);
+
+			plugin.getLogger().log(
+					Level.SEVERE,
+					ChatUtil.translateString("&cFailed to load config file: " + fileName),
+					e
+			);
 		}
 		this.reload();
 	}
@@ -54,7 +78,13 @@ public class Config {
 		try {
 			this.config.load(this.configFile);
 		} catch (IOException | InvalidConfigurationException e) {
-			this.plugin.getLogger().log(Level.SEVERE, "Failed to reload config file: " + this.configFile.getName(), e);
+
+			this.plugin.getLogger().log(
+					Level.SEVERE,
+					ChatUtil.translateString("&cFailed to reload config file: " + this.configFile.getName()),
+					e
+			);
+
 		}
 	}
 
@@ -66,7 +96,13 @@ public class Config {
 			this.config.options().copyDefaults(true);
 			this.config.save(this.configFile);
 		} catch (IOException e) {
-			this.plugin.getLogger().log(Level.SEVERE, "Failed to save config file: " + this.configFile.getName(), e);
+
+			this.plugin.getLogger().log(
+					Level.SEVERE,
+					ChatUtil.translateString("&cFailed to save config file: " + this.configFile.getName()),
+					e
+			);
+
 		}
 	}
 

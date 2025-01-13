@@ -12,7 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.List;
 
 @Getter
-public class ItemManager {
+public class ItemManager { //TODO: Make better!!
     private BaseItem areaSelector;
 
     public ItemManager() {

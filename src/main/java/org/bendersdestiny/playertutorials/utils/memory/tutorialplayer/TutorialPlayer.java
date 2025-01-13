@@ -28,13 +28,16 @@ public class TutorialPlayer {
 
 	@Setter
 	private Location pos1, pos2;
-
 	@Setter
 	private int particleTaskId = -1;
-
 	@Setter
 	private Tutorial editingTutorial;
 
+	/**
+	 * Helper Class for easy data retrival and defining / finding Players who manage tutorials / play a tutorial.
+	 *
+	 * @param uuid UUID of the Player Managing / Playing the tutorial
+	 */
 	public TutorialPlayer(UUID uuid) {
 		this.uuid = uuid;
 		this.player = Bukkit.getPlayer(uuid);
@@ -96,9 +99,7 @@ public class TutorialPlayer {
 		ORIGINAL_ITEMS.put(this.uuid, original);
 
 		player.getInventory().clear();
-		player.getInventory().setItem(4,
-				PlayerTutorials.getInstance().getItemManager().getAreaSelector().getItem()
-		);
+		player.getInventory().setItem(4, PlayerTutorials.getInstance().getItemManager().getAreaSelector().getItem());
 		player.getInventory().setHeldItemSlot(4);
 
 		String mainTitle = "&#828282Select the &#b43cd2area &#828282with the &#f0c435Axe";
@@ -109,11 +110,13 @@ public class TutorialPlayer {
 				Duration.ofMillis(3000),
 				Duration.ofMillis(500)
 		);
+
 		Title title = Title.title(
 				ChatUtil.translate(mainTitle),
 				ChatUtil.translate(subTitle),
 				times
 		);
+
 		player.showTitle(title);
 	}
 

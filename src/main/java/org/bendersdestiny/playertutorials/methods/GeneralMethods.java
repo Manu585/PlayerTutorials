@@ -3,12 +3,8 @@ package org.bendersdestiny.playertutorials.methods;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class GeneralMethods {
 
@@ -53,27 +49,5 @@ public class GeneralMethods {
 		double y = Double.parseDouble(parts[2]);
 		double z = Double.parseDouble(parts[3]);
 		return new Location(w, x, y, z);
-	}
-
-	/**
-	 * Get all blocks in an area of two {@link Location}.
-	 *
-	 * @param PointA First point
-	 * @param PointB Second point
-	 * @param world The world of the blocks
-	 * @return all blocks in the area
-	 */
-	public static @NotNull Set<Block> blocksInArea(@NotNull Location PointA,
-												   @NotNull Location PointB,
-												   @NotNull World world) {
-		Set<Block> blocks = new HashSet<>();
-		for (int x = PointA.getBlockX(); x <= PointB.getBlockX(); x++) {
-			for (int y = PointA.getBlockY(); y <= PointB.getBlockY(); y++) {
-				for (int z = PointA.getBlockZ(); z <= PointB.getBlockZ(); z++) {
-					blocks.add(world.getBlockAt(new Location(world, x, y, z)));
-				}
-			}
-		}
-		return blocks;
 	}
 }

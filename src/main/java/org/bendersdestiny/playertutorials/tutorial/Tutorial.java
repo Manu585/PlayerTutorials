@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.tutorial.area.Area;
+import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bukkit.Material;
 
 import javax.annotation.Nullable;
@@ -58,8 +59,11 @@ public class Tutorial {
 		if (this.areas != null && area != null) {
 			this.areas.add(area);
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
-					"Error while adding a new area to tutorial!");
+
+			PlayerTutorials.getInstance().getLogger().log(
+					Level.SEVERE,
+					ChatUtil.translateString("&cError while adding a new area to tutorial!"));
+
 		}
 	}
 
@@ -72,8 +76,11 @@ public class Tutorial {
 		if (this.areas != null && area != null) {
 			this.areas.remove(area);
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
-					"Error while removing an area from tutorial!");
+
+			PlayerTutorials.getInstance().getLogger().log(
+					Level.SEVERE,
+					ChatUtil.translateString("&cError while removing an area from tutorial!"));
+
 		}
 	}
 }

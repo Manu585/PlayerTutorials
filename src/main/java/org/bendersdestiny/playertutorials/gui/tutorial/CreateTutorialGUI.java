@@ -2,12 +2,12 @@ package org.bendersdestiny.playertutorials.gui.tutorial;
 
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
+import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.gui.util.SelectIconGUI;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
@@ -22,8 +22,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class CreateTutorialGUI {
@@ -31,42 +33,25 @@ public class CreateTutorialGUI {
     private final StaticPane pane;
 
     @Setter
-    private String tutorialTitle = "Tutorial"; // DEFAULT
+    private String tutorialTitle;
     @Setter
-    private Material tutorialIcon = Material.DIORITE; // DEFAULT
+    private Material tutorialIcon;
 
-    public CreateTutorialGUI(Player player) {
-        UUID uuid = player.getUniqueId();
+    public CreateTutorialGUI(@Nullable String initialTitle, @Nullable Material initialIcon) {
+        this.tutorialTitle = (initialTitle != null) ? initialTitle : "Tutorial";
+        this.tutorialIcon = (initialIcon != null) ? initialIcon : Material.DIORITE;
 
-        Map<Integer, String> cache = MemoryUtil.getGuiCache().computeIfAbsent(uuid, k -> new HashMap<>()); // Cache for Tutorial Name + Icon
-
-        if (cache.containsKey(0)) {
-            try {
-                this.tutorialIcon = Material.valueOf(cache.get(0));
-            } catch (Exception ex) {
-                this.tutorialIcon = Material.DIORITE;
-            }
-        } else {
-            this.tutorialIcon = Material.DIORITE;
-        }
-
-        if (cache.containsKey(1)) {
-            this.tutorialTitle = cache.get(1);
-        } else {
-            this.tutorialTitle = "Tutorial";
-        }
-
-        String legacyTitle = LegacyComponentSerializer.legacySection().serialize(ChatUtil.translate("&#54c72eCreate Tutorial"));
-        this.gui = new ChestGui(1, legacyTitle, PlayerTutorials.getInstance());
-        this.pane = new StaticPane(0, 0, 9, 1);
+        this.gui = new ChestGui(1, ChatUtil.translateString("&#54c72eCreate Tutorial"), PlayerTutorials.getInstance());
+        this.pane = new StaticPane(0, 0, 9, 1, Pane.Priority.HIGH);
 
         this.setupUI();
-        this.gui.setOnGlobalClick(e -> e.setCancelled(true));
     }
 
     private void setupUI() {
         this.gui.addPane(this.pane);
         this.pane.setVisible(true);
+
+        this.gui.setOnGlobalClick(e -> e.setCancelled(true));
 
         this.pane.addItem(getChangeNameItem(), Slot.fromIndex(1));
         this.pane.addItem(getChangeIconItem(), Slot.fromIndex(4));
@@ -87,7 +72,7 @@ public class CreateTutorialGUI {
 
         return new GuiItem(stack, event -> {
             if (event.getWhoClicked() instanceof Player p) {
-                new SelectIconGUI().getGui().show(p);
+                new SelectIconGUI(this).getGui().show(p);
             }
         });
     }
@@ -110,12 +95,11 @@ public class CreateTutorialGUI {
                 // Start a conversation to rename the tutorial
                 p.closeInventory();
                 ConversationFactory factory = new ConversationFactory(PlayerTutorials.getInstance());
-                Conversation conversation = factory.withFirstPrompt(new TutorialNamePrompt())
+                Conversation conversation = factory.withFirstPrompt(new TutorialNamePrompt(this))
                         .withLocalEcho(false)
                         .withTimeout(60)
                         .buildConversation(p);
 
-                conversation.getContext().setSessionData("gui", this);
                 conversation.begin();
             }
         });
@@ -150,8 +134,7 @@ public class CreateTutorialGUI {
                         newTutorial.getId() +
                         "&#828282)"));
 
-                // Clear the cache + reset
-                MemoryUtil.getGuiCache().clear();
+                // Reset
                 this.tutorialTitle = "Tutorial";
                 this.tutorialIcon = Material.DIORITE;
 
@@ -163,5 +146,15 @@ public class CreateTutorialGUI {
                 modify.getGui().show(event.getWhoClicked());
             }
         });
+    }
+
+    /**
+     * Updates the tutorial name and icon in the GUI.
+     */
+    public void updateGUI() {
+        this.pane.addItem(getSaveItem(), Slot.fromIndex(7));
+        this.pane.addItem(getChangeIconItem(), Slot.fromIndex(4));
+        this.pane.addItem(getChangeNameItem(), Slot.fromIndex(1));
+        this.gui.update();
     }
 }

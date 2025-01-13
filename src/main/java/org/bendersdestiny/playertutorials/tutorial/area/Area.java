@@ -8,6 +8,7 @@ import org.bendersdestiny.playertutorials.tutorial.area.structure.Structure;
 import org.bendersdestiny.playertutorials.tutorial.task.Task;
 import org.bendersdestiny.playertutorials.tutorial.task.tasks.CommandTask;
 import org.bendersdestiny.playertutorials.tutorial.task.tasks.TeleportTask;
+import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bukkit.Location;
 
@@ -77,8 +78,11 @@ public class Area {
 				default -> {}
 			}
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
-					"Error while adding a new task to area!");
+
+			PlayerTutorials.getInstance().getLogger().log(
+					Level.SEVERE,
+					ChatUtil.translateString("&cError while adding a new task to area!"));
+
 		}
 	}
 
@@ -99,8 +103,11 @@ public class Area {
 				default -> {}
 			}
 		} else {
-			PlayerTutorials.getInstance().getLogger().log(Level.SEVERE,
-					"Error while removing a task from area!");
+
+			PlayerTutorials.getInstance().getLogger().log(
+					Level.SEVERE,
+					ChatUtil.translateString("&cError while removing a task from area!"));
+
 		}
 	}
 }

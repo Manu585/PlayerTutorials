@@ -16,6 +16,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.logging.Level;
+
 public final class PlayerTutorials extends JavaPlugin {
 	@Getter
 	private static PlayerTutorials instance;
@@ -96,14 +98,18 @@ public final class PlayerTutorials extends JavaPlugin {
 					MemoryUtil.loadStructures();
 
 					// Attach areas to tutorials in memory
-					MemoryUtil.addAreasToTutorials();
+					MemoryUtil.linkAreasToTutorials();
 
 				} catch (Exception e) {
-					PlayerTutorials.getInstance().getLogger().severe("Fatal error loading everything: " + e.getMessage());
-					e.printStackTrace();
+
+					PlayerTutorials.getInstance().getLogger().log(
+							Level.SEVERE,
+							ChatUtil.translateString("Fatal error loading everything: " + e.getMessage()),
+							e
+					);
+
 				}
 			}
 		}.runTaskAsynchronously(this);
 	}
-
 }

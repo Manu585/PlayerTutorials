@@ -1,12 +1,14 @@
 package org.bendersdestiny.playertutorials.commands;
 
 import dev.rollczi.litecommands.annotations.argument.Arg;
+import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import dev.rollczi.litecommands.annotations.permission.Permission;
 import lombok.Getter;
 import org.bendersdestiny.playertutorials.gui.MasterGUI;
 import org.bendersdestiny.playertutorials.gui.tutorial.CreateTutorialGUI;
+import org.bendersdestiny.playertutorials.manager.StructureManager;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
 import org.bendersdestiny.playertutorials.tutorial.area.Area;
 import org.bendersdestiny.playertutorials.tutorial.area.structure.Structure;
@@ -15,9 +17,10 @@ import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
 import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
-@dev.rollczi.litecommands.annotations.command.Command(name = "tutorial", aliases = "t")
+@Command(name = "tutorial", aliases = "t")
 @Permission("playertutorials.tutorial")
 public class TutorialCommand {
 
@@ -26,13 +29,33 @@ public class TutorialCommand {
         new MasterGUI().getGui().show(sender);
     }
 
+    @Execute(name = "pos1", aliases = "p1")
+    void setPositionOne(@Context @NotNull Player sender) {
+        TutorialPlayer tutorialPlayer = TutorialPlayer.getPlayer(sender.getUniqueId());
+
+        if (tutorialPlayer != null) {
+            tutorialPlayer.setPos1(sender.getLocation());
+            sender.sendMessage(ChatUtil.translate("Successfully set Pos1 for your area!"));
+        }
+    }
+
+    @Execute(name = "pos2", aliases = "p2")
+    void setPositionTwo(@Context @NotNull Player sender) {
+        TutorialPlayer tutorialPlayer = TutorialPlayer.getPlayer(sender.getUniqueId());
+
+        if (tutorialPlayer != null) {
+            tutorialPlayer.setPos2(sender.getLocation());
+            sender.sendMessage(ChatUtil.translate("Successfully set Pos2 for your area!"));
+        }
+    }
+
     @Execute(name = "create", aliases = "c")
     void createCommand(@Context Player sender) {
-        new CreateTutorialGUI(sender).getGui().show(sender);
+        new CreateTutorialGUI(null, null).getGui().show(sender);
     }
 
     @Execute(name = "areaaccept")
-    void selectionToolCommand(@Context Player sender) {
+    void selectionToolCommand(@Context @NotNull Player sender) {
         TutorialPlayer tp = TutorialPlayer.getPlayer(sender.getUniqueId());
         if (tp == null) return;
 
@@ -41,6 +64,9 @@ public class TutorialCommand {
             Bukkit.getScheduler().cancelTask(taskId);
             tp.setParticleTaskId(-1);
         }
+
+        StructureManager.handleAreaSelection(sender, tp.getEditingTutorial(), "Test", tp.getPos1(), tp.getPos2(), 1);
+
         sender.sendMessage(ChatUtil.translate("Area accepted! Particles removed."));
     }
 
@@ -58,7 +84,7 @@ public class TutorialCommand {
         }
         Area firstArea = tutorial.getAreas().getFirst();
 
-        Structure structure = MemoryUtil.loadStructure(firstArea.getAreaID());
+        Structure structure = MemoryUtil.getCreatedStructures().get(firstArea.getAreaID());
         if (structure == null) {
             sender.sendMessage(ChatUtil.translate("&cNo structure or blocks found for area: " + firstArea.getName()));
             return;

@@ -7,7 +7,7 @@ import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPl
 import org.bukkit.entity.Player;
 
 @Getter
-public class TutorialManager {
+public class TutorialManager { //TODO: FINISH
 	private final Tutorial tutorial;
 	private final Area area;
 	private final Player player;

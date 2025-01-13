@@ -68,14 +68,20 @@ public class ChatUtil {
 		}
 
 		String replacedHex = replaceHexCodes(input);
-
 		replacedHex = replacedHex.replace('&', '§');
-
 		Component component = LegacyComponentSerializer.legacySection().deserialize(replacedHex);
-
 		component = component.decoration(TextDecoration.ITALIC, false);
 
 		return component;
+	}
+
+	/**
+	 * Small helper for String required methods
+	 * @param message String to translate color codes (legacy & #rrggbb)
+	 * @return translatedString
+	 */
+	public static String translateString(String message) {
+		return LegacyComponentSerializer.legacySection().serialize(ChatUtil.translate(message));
 	}
 
 	/**
@@ -113,8 +119,7 @@ public class ChatUtil {
 		&6╚═╝        ╚═╝
 		""";
 
-		String formattedMessage = LegacyComponentSerializer.legacySection().serialize(translate(String.format
-				(startupMessage, this.plugin.getPluginMeta().getVersion())));
+		String formattedMessage = translateString(String.format(startupMessage, this.plugin.getPluginMeta().getVersion()));
 		this.plugin.getServer().getConsoleSender().sendMessage(formattedMessage);
 	}
 
@@ -132,8 +137,7 @@ public class ChatUtil {
 		&6╚═╝        ╚═╝
 		""";
 
-		String formattedMessage = LegacyComponentSerializer.legacySection().serialize(translate(String.format
-				(startupMessage, this.plugin.getPluginMeta().getVersion())));
+		String formattedMessage = translateString(String.format(startupMessage, this.plugin.getPluginMeta().getVersion()));
 		this.plugin.getServer().getConsoleSender().sendMessage(formattedMessage);
 	}
 }
