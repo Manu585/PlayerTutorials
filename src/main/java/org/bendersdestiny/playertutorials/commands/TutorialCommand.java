@@ -6,16 +6,18 @@ import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import dev.rollczi.litecommands.annotations.permission.Permission;
 import lombok.Getter;
+import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.gui.MasterGUI;
 import org.bendersdestiny.playertutorials.gui.tutorial.CreateTutorialGUI;
-import org.bendersdestiny.playertutorials.manager.StructureManager;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
 import org.bendersdestiny.playertutorials.tutorial.area.Area;
-import org.bendersdestiny.playertutorials.tutorial.area.structure.Structure;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
+import org.bendersdestiny.playertutorials.utils.chat.prompts.AreaNamePrompt;
 import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
-import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPlayer;
+import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.AdminTutorialPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationFactory;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,21 +33,21 @@ public class TutorialCommand {
 
     @Execute(name = "pos1", aliases = "p1")
     void setPositionOne(@Context @NotNull Player sender) {
-        TutorialPlayer tutorialPlayer = TutorialPlayer.getPlayer(sender.getUniqueId());
+        AdminTutorialPlayer tutorialPlayer = (AdminTutorialPlayer) AdminTutorialPlayer.getPlayer(sender.getUniqueId());
 
         if (tutorialPlayer != null) {
             tutorialPlayer.setPos1(sender.getLocation());
-            sender.sendMessage(ChatUtil.translate("Successfully set Pos1 for your area!"));
+            sender.sendMessage(ChatUtil.translate("&#828282Successfully set &#f0c435Pos1&#828282 for your area!"));
         }
     }
 
     @Execute(name = "pos2", aliases = "p2")
     void setPositionTwo(@Context @NotNull Player sender) {
-        TutorialPlayer tutorialPlayer = TutorialPlayer.getPlayer(sender.getUniqueId());
+        AdminTutorialPlayer tutorialPlayer = (AdminTutorialPlayer) AdminTutorialPlayer.getPlayer(sender.getUniqueId());
 
         if (tutorialPlayer != null) {
             tutorialPlayer.setPos2(sender.getLocation());
-            sender.sendMessage(ChatUtil.translate("Successfully set Pos2 for your area!"));
+            sender.sendMessage(ChatUtil.translate("&#828282Successfully set &#f0c435Pos2&#828282 for your &#82c238area&#828282!"));
         }
     }
 
@@ -56,7 +58,7 @@ public class TutorialCommand {
 
     @Execute(name = "areaaccept")
     void selectionToolCommand(@Context @NotNull Player sender) {
-        TutorialPlayer tp = TutorialPlayer.getPlayer(sender.getUniqueId());
+        AdminTutorialPlayer tp = (AdminTutorialPlayer) AdminTutorialPlayer.getPlayer(sender.getUniqueId());
         if (tp == null) return;
 
         int taskId = tp.getParticleTaskId();
@@ -65,38 +67,39 @@ public class TutorialCommand {
             tp.setParticleTaskId(-1);
         }
 
-        StructureManager.handleAreaSelection(sender, tp.getEditingTutorial(), "Test", tp.getPos1(), tp.getPos2(), 1);
+        ConversationFactory factory = new ConversationFactory(PlayerTutorials.getInstance());
+        Conversation conversation = factory.withFirstPrompt(new AreaNamePrompt(tp))
+                .withLocalEcho(false)
+                .withTimeout(60)
+                .buildConversation(sender);
 
-        sender.sendMessage(ChatUtil.translate("Area accepted! Particles removed."));
+        conversation.begin();
     }
 
     @Execute(name = "starttutorial")
     void startTutorial(@Context Player sender, @Arg int tutorialId) {
         Tutorial tutorial = MemoryUtil.getCreatedTutorials().get(tutorialId);
         if (tutorial == null) {
-            sender.sendMessage(ChatUtil.translate("&cNo tutorial found with ID " + tutorialId));
+            sender.sendMessage(ChatUtil.translate("&#dc4848No tutorial found with ID &#f0c435" + tutorialId));
             return;
         }
 
         if (tutorial.getAreas().isEmpty()) {
-            sender.sendMessage(ChatUtil.translate("&cTutorial '" + tutorial.getName() + "' has no areas!"));
+            sender.sendMessage(ChatUtil.translate("&#dc4848Tutorial &#828282'" + tutorial.getName() + "&#828282' has no areas!"));
             return;
         }
+
         Area firstArea = tutorial.getAreas().getFirst();
 
-        Structure structure = MemoryUtil.getCreatedStructures().get(firstArea.getAreaID());
-        if (structure == null) {
-            sender.sendMessage(ChatUtil.translate("&cNo structure or blocks found for area: " + firstArea.getName()));
-            return;
+        for (Area area : tutorial.getAreas()) {
+            area.spawnArea(sender.getLocation());
         }
-
-        structure.spawn(sender.getLocation().add(0, 3, 0));
 
         if (firstArea.getSpawnPoint() != null) {
             sender.teleport(firstArea.getSpawnPoint());
-            sender.sendMessage(ChatUtil.translate("&aTutorial '" + tutorial.getName() + "' started!"));
+            sender.sendMessage(ChatUtil.translate("&#f0c435Tutorial &#828282'" + tutorial.getName() + "&#828282' started!"));
         } else {
-            sender.sendMessage(ChatUtil.translate("&cNo spawnPoint set for area: " + firstArea.getName()));
+            sender.sendMessage(ChatUtil.translate("&#dc4848No spawnPoint set for area: " + firstArea.getName()));
         }
     }
 }

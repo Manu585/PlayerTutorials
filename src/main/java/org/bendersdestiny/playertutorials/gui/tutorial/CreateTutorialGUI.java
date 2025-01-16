@@ -121,7 +121,6 @@ public class CreateTutorialGUI {
 
         return new GuiItem(stack, event -> {
             if (this.tutorialTitle != null && this.tutorialIcon != null) {
-                // Create the tutorial in DB
                 Tutorial newTutorial = MemoryUtil.createTutorial(this.tutorialTitle, this.tutorialIcon);
                 if (newTutorial == null) {
                     event.getWhoClicked().sendMessage(ChatUtil.translate("&#d24141Error creating tutorial!"));

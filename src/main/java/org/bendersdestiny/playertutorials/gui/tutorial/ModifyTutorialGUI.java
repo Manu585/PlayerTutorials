@@ -6,14 +6,13 @@ import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import lombok.Getter;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.gui.MasterGUI;
 import org.bendersdestiny.playertutorials.tutorial.Tutorial;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
 import org.bendersdestiny.playertutorials.utils.chat.prompts.TutorialRenamePrompt;
 import org.bendersdestiny.playertutorials.utils.memory.MemoryUtil;
-import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPlayer;
+import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.AdminTutorialPlayer;
 import org.bukkit.Material;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationFactory;
@@ -30,7 +29,7 @@ public class ModifyTutorialGUI {
     private final Tutorial tutorial;
 
     public ModifyTutorialGUI(Tutorial tutorial) {
-        this.gui = new ChestGui(2, LegacyComponentSerializer.legacySection().serialize(ChatUtil.translate("&#4a6ad2Modify " + tutorial.getName())), PlayerTutorials.getInstance());
+        this.gui = new ChestGui(2, ChatUtil.translateString("&#4a6ad2Modify " + tutorial.getName()), PlayerTutorials.getInstance());
         this.pane = new StaticPane(0, 0, 9, 2, Pane.Priority.HIGH);
 
         this.tutorial = tutorial;
@@ -110,7 +109,7 @@ public class ModifyTutorialGUI {
         return new GuiItem(item, event -> {
             if (!(event.getWhoClicked() instanceof Player p)) return;
 
-            TutorialPlayer tutorialPlayer = TutorialPlayer.getPlayer(p.getUniqueId());
+            AdminTutorialPlayer tutorialPlayer = (AdminTutorialPlayer) AdminTutorialPlayer.getPlayer(p.getUniqueId());
             if (tutorialPlayer != null) {
                 tutorialPlayer.setEditingTutorial(this.tutorial);
                 tutorialPlayer.enterAreaSelectionMode();

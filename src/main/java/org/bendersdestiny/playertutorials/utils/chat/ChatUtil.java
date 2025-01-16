@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
  * method and do much more with the remaining methods.
  */
 public class ChatUtil {
+	public static String textColor = "&#828282";
+
 	private final PlayerTutorials plugin;
 	private static final Pattern HEX_PATTERN = Pattern.compile("&#([a-fA-F0-9]{6})");
 
@@ -76,15 +78,6 @@ public class ChatUtil {
 	}
 
 	/**
-	 * Small helper for String required methods
-	 * @param message String to translate color codes (legacy & #rrggbb)
-	 * @return translatedString
-	 */
-	public static String translateString(String message) {
-		return LegacyComponentSerializer.legacySection().serialize(ChatUtil.translate(message));
-	}
-
-	/**
 	 * Replaces `&#RRGGBB` occurrences with the legacy `§x§R§R§G§G§B§B` format.
 	 */
 	private static String replaceHexCodes(String input) {
@@ -103,6 +96,15 @@ public class ChatUtil {
 		matcher.appendTail(sb);
 
 		return sb.toString();
+	}
+
+	/**
+	 * Small helper for String required methods
+	 * @param message String to translate color codes (legacy & #rrggbb)
+	 * @return translatedString
+	 */
+	public static String translateString(String message) {
+		return LegacyComponentSerializer.legacySection().serialize(ChatUtil.translate(message));
 	}
 
 	/**

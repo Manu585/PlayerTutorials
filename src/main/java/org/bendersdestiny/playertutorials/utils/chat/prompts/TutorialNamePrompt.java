@@ -34,11 +34,20 @@ public class TutorialNamePrompt extends StringPrompt {
             return END_OF_CONVERSATION;
         }
 
+        updateGuiAndTitle(input.trim(), player);
+        player.sendMessage(ChatUtil.translate("&#f0c435Tutorial name &#828282updated to " + input.trim()));
+
+        return END_OF_CONVERSATION;
+    }
+
+    /**
+     * Helper method because it looks ugly
+     * @param input Tutorial Title
+     * @param player Player
+     */
+    void updateGuiAndTitle(String input, Player player) {
         parentGUI.setTutorialTitle(input.trim());
         parentGUI.updateGUI();
         parentGUI.getGui().show(player);
-        player.sendMessage(ChatUtil.translate("&#a0e862Tutorial name updated to " + input.trim()));
-
-        return END_OF_CONVERSATION;
     }
 }

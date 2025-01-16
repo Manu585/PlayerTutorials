@@ -6,16 +6,16 @@ import org.bukkit.Material;
 
 @Getter
 @Setter
-public class StructureBlock {
+public class AreaBlock {
 	private int relativeX;
 	private int relativeY;
 	private int relativeZ;
 	private Material material;
 
-	public StructureBlock(int relativeX, int relativeY, int relativeZ, Material material) {
-		this.relativeX = relativeX;
-		this.relativeY = relativeY;
-		this.relativeZ = relativeZ;
-		this.material = material;
+	public AreaBlock(int rx, int ry, int rz, Material mat) {
+		this.relativeX = rx;
+		this.relativeY = ry;
+		this.relativeZ = rz;
+		this.material = mat;
 	}
 }

@@ -57,19 +57,13 @@ public final class PlayerTutorials extends JavaPlugin {
 		new ConfigManager(this);
 		this.storage = new Storage(); // Setup storage after config is initialized for Databasetype retrival!
 		this.itemManager = new ItemManager();
+		this.chatUtil.sendServerStartupMessage();
 
 		this.loadEverythingAsync();
-
-		this.chatUtil.sendServerStartupMessage();
 	}
 
 	@Override
 	public void onDisable() {
-		MemoryUtil.saveTutorials();
-		MemoryUtil.saveAreas();
-		MemoryUtil.saveTasks();
-		MemoryUtil.saveStructures();
-
 		if (this.storage != null) {
 			this.storage.disconnect();
 		}
@@ -92,14 +86,7 @@ public final class PlayerTutorials extends JavaPlugin {
 			@Override
 			public void run() {
 				try {
-					MemoryUtil.loadTutorials();
-					MemoryUtil.loadAreas();
-					MemoryUtil.loadTasks();
-					MemoryUtil.loadStructures();
-
-					// Attach areas to tutorials in memory
-					MemoryUtil.linkAreasToTutorials();
-
+					MemoryUtil.loadAllData();
 				} catch (Exception e) {
 
 					PlayerTutorials.getInstance().getLogger().log(

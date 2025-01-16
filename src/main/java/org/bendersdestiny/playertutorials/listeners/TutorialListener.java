@@ -6,7 +6,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import org.bendersdestiny.playertutorials.PlayerTutorials;
 import org.bendersdestiny.playertutorials.manager.ItemManager;
 import org.bendersdestiny.playertutorials.utils.chat.ChatUtil;
-import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.TutorialPlayer;
+import org.bendersdestiny.playertutorials.utils.memory.tutorialplayer.AdminTutorialPlayer;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +28,18 @@ public class TutorialListener implements Listener {
 	public void onJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
 
-		TutorialPlayer.registerPlayer(new TutorialPlayer(p.getUniqueId()));
+		if (p.hasPermission("playertutorials.admin"))
+			AdminTutorialPlayer.registerPlayer(new AdminTutorialPlayer(p.getUniqueId()));
+	}
+
+	@EventHandler
+	public void onQuit(PlayerQuitEvent e) {
+		Player p = e.getPlayer();
+		AdminTutorialPlayer adminTP = (AdminTutorialPlayer) AdminTutorialPlayer.getPlayer(p.getUniqueId());
+
+		if (adminTP.isAreaSelectionMode()) {
+			adminTP.leaveAreaSelectionMode();
+		}
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
@@ -43,34 +55,34 @@ public class TutorialListener implements Listener {
 
 		if (!isAreaSelector(inHand, itemManager)) return;
 
-		TutorialPlayer tutorialPlayer = TutorialPlayer.getPlayer(p.getUniqueId());
-		if (tutorialPlayer == null) return;
+		AdminTutorialPlayer adminTutorialPlayer = (AdminTutorialPlayer) AdminTutorialPlayer.getPlayer(p.getUniqueId());
+		if (adminTutorialPlayer == null) return;
 
 		e.setCancelled(true);
 
 		Location blockLocation = e.getClickedBlock().getLocation();
 
 		if (action == Action.LEFT_CLICK_BLOCK) {
-			tutorialPlayer.setPos1(blockLocation);
+			adminTutorialPlayer.setPos1(blockLocation);
 			p.sendMessage(ChatUtil.translate("&#f0c435Pos1 &#828282set to &#f0c435" + locToString(blockLocation)));
 			e.setCancelled(true);
 		}
 
 		else if (action == Action.RIGHT_CLICK_BLOCK) {
-			tutorialPlayer.setPos2(blockLocation);
+			adminTutorialPlayer.setPos2(blockLocation);
 			p.sendMessage(ChatUtil.translate("&#f0c435Pos2 &#828282set to &#f0c435" + locToString(blockLocation)));
 			e.setCancelled(true);
 		}
 
-		if (tutorialPlayer.getPos1() != null && tutorialPlayer.getPos2() != null && tutorialPlayer.getParticleTaskId() == -1) {
-			Color color = parseTutorialColor(tutorialPlayer.getEditingTutorial().getName());
+		if (adminTutorialPlayer.getPos1() != null && adminTutorialPlayer.getPos2() != null && adminTutorialPlayer.getParticleTaskId() == -1) {
+			Color color = parseTutorialColor(adminTutorialPlayer.getEditingTutorial().getName());
 
 			int taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(
 					PlayerTutorials.getInstance(),
-					() -> drawParticleOutline(p, tutorialPlayer.getPos1(), tutorialPlayer.getPos2(), color),
+					() -> drawParticleOutline(p, adminTutorialPlayer.getPos1(), adminTutorialPlayer.getPos2(), color),
 					0L, 10L
 			);
-			tutorialPlayer.setParticleTaskId(taskId);
+			adminTutorialPlayer.setParticleTaskId(taskId);
 
 			sendAcceptMessage(p);
 
@@ -133,7 +145,8 @@ public class TutorialListener implements Listener {
 	 * Helper method to spawn a single particle at the given block coords.
 	 */
 	private void spawnParticle(@NotNull World world, int x, int y, int z, Particle.DustOptions dust) {
-		world.spawnParticle(Particle.DUST,
+		world.spawnParticle(
+				Particle.DUST,
 				x + 0.5, y + 0.5, z + 0.5,
 				1,
 				0, 0, 0,
